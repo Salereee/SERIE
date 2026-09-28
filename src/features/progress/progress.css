@@ -1,0 +1,117 @@
+.prog__stats {
+  --cols: 2 !important;
+}
+.prog__stats .stat:nth-child(3) {
+  border-left: 0;
+  padding-left: 0;
+}
+.prog__stats .stat:nth-child(n + 3) {
+  border-top: var(--b1);
+}
+@media (min-width: 700px) {
+  .prog__stats {
+    --cols: 4 !important;
+  }
+  .prog__stats .stat:nth-child(3) {
+    border-left: var(--b1);
+    padding-left: 12px;
+  }
+  .prog__stats .stat:nth-child(n + 3) {
+    border-top: 0;
+  }
+}
+@media (min-width: 900px) {
+  .prog__grid {
+    row-gap: 40px;
+  }
+}
+
+.weeknav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: -10px 0;
+}
+
+.trend {
+  width: 100%;
+  border-collapse: collapse;
+}
+.trend th,
+.trend td {
+  padding: 6px 8px 6px 0;
+  border-bottom: var(--bs);
+  text-align: left;
+  font-size: 14px;
+}
+.trend thead th {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: var(--b2);
+}
+.trend tbody th {
+  font-weight: 600;
+}
+.trend .num {
+  text-align: right;
+  padding-right: 0;
+}
+
+.tabs-line {
+  display: flex;
+  gap: 0;
+  border-bottom: var(--b2);
+}
+.tabs-line button {
+  min-height: 44px;
+  padding: 0 14px;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--muted);
+  border-bottom: 4px solid transparent;
+  margin-bottom: -2px;
+}
+.tabs-line button[aria-selected='true'] {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
+.reps-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.reps-table th,
+.reps-table td {
+  text-align: left;
+  padding: 8px 0;
+  border-bottom: var(--b1);
+}
+.reps-table thead th {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: var(--b2);
+}
+.reps-table .num {
+  text-align: right;
+}
+
+.xh {
+  display: grid;
+  grid-template-columns: 72px 1fr auto;
+  gap: 12px;
+  align-items: baseline;
+  padding: 10px 0;
+  border-bottom: var(--b1);
+}
+.xh__sets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  font-size: 14px;
+}

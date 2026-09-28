@@ -1,0 +1,118 @@
+.report {
+  display: grid;
+  gap: 28px;
+}
+.report__stats {
+  --cols: 2 !important;
+}
+.report__stats .stat:nth-child(3) {
+  border-left: 0;
+  padding-left: 0;
+}
+.report__stats .stat:nth-child(n + 3) {
+  border-top: var(--b1);
+}
+@media (min-width: 700px) {
+  .report__stats {
+    --cols: 4 !important;
+  }
+  .report__stats .stat:nth-child(3) {
+    border-left: var(--b1);
+    padding-left: 12px;
+  }
+  .report__stats .stat:nth-child(n + 3) {
+    border-top: 0;
+  }
+}
+.stat[data-accent] .num-lg {
+  color: var(--accent);
+}
+.report__prhead {
+  border-top-color: var(--accent);
+}
+.report__prs li {
+  border-left: 4px solid var(--accent);
+  padding-left: 12px;
+}
+/* Récords: la barra de acento crece desde arriba y cada récord entra escalonado después de los números. */
+.route .report__prs > li {
+  animation: enter-left var(--t-base) var(--ease) both;
+}
+.route .report__prs > li:nth-child(1) { animation-delay: 520ms; }
+.route .report__prs > li:nth-child(2) { animation-delay: 580ms; }
+.route .report__prs > li:nth-child(3) { animation-delay: 640ms; }
+.route .report__prs > li:nth-child(n + 4) { animation-delay: 700ms; }
+.stat[data-accent] .num-lg {
+  animation: stamp var(--t-base) var(--ease) 900ms both;
+}
+
+.report__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.report__table th,
+.report__table td {
+  text-align: left;
+  padding: 10px 8px 10px 0;
+  border-bottom: var(--b1);
+  vertical-align: top;
+}
+.report__table thead th {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: var(--b2);
+}
+.report__table tbody th {
+  font-weight: 600;
+  width: 40%;
+}
+.report__table tbody th a {
+  text-decoration: none;
+}
+.report__table tbody th a:hover {
+  text-decoration: underline;
+}
+.report__table td.mono {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  font-size: 14px;
+}
+.report__table .num {
+  text-align: right;
+  padding-right: 0;
+}
+.report__table td.num {
+  display: table-cell;
+}
+.report__warm {
+  color: var(--muted);
+}
+@media (max-width: 599px) {
+  .report__table thead {
+    display: none;
+  }
+  .report__table tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    border-bottom: var(--b1);
+    padding: 8px 0;
+  }
+  .report__table th,
+  .report__table td {
+    border: 0;
+    padding: 2px 0;
+    width: auto !important;
+  }
+  .report__table td.mono:not(.num) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .report__table td.num {
+    grid-row: 1;
+    grid-column: 2;
+  }
+}

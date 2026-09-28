@@ -1,0 +1,81 @@
+/* Tokens. Un solo acento; los temas cambian solo estas variables. */
+:root {
+  --font-display: 'Space Grotesk', 'Arial Narrow', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --bg: #f2f1ec;
+  --surface: #fbfaf7;
+  --ink: #0e0e0d;
+  --ink-2: #3d3c38;
+  --muted: #5d5c56; /* 6.1:1 sobre --bg */
+  --line: #0e0e0d;
+  --line-soft: #c9c7bf;
+  --fill: #e6e4dd;
+  --accent: #c43800; /* 5.3:1 sobre --bg: válido como texto */
+  --accent-ink: #ffffff; /* texto sobre acento: 5.6:1 */
+  --accent-soft: #f7dccf;
+  --danger: #a3160c;
+  --focus: #0e0e0d; /* foco: tinta sólida, acorde a la grilla */
+
+  --b1: 1px solid var(--line);
+  --b2: 2px solid var(--line);
+  --bs: 1px solid var(--line-soft);
+
+  --radius: 2px;
+  --gutter: 16px;
+  --tap: 48px;
+  --tap-lg: 56px;
+  --nav-h: 60px;
+  --timer-h: 64px;
+  --sidebar-w: 232px;
+
+  /* Movimiento: curvas fuertes; nada de ease-in en UI. */
+  --ease: cubic-bezier(0.23, 1, 0.32, 1); /* ease-out: entradas, salidas, feedback */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1); /* movimiento sobre pantalla */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1); /* hojas inferiores */
+  --t-press: 120ms;
+  --t-fast: 180ms;
+  --t-base: 240ms;
+  --t-slow: 420ms; /* solo momentos raros: resumen, primera vez */
+
+  /* Regla graduada: marca de identidad (como la cinta de una barra olímpica). */
+  --ruler: repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 8px),
+    repeating-linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 40px);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='claro']) {
+    --bg: #0e0e0d;
+    --surface: #161614;
+    --ink: #f2f1ec;
+    --ink-2: #cfcdc5;
+    --muted: #a3a198; /* 7.3:1 sobre --bg */
+    --line: #f2f1ec;
+    --line-soft: #3a3935;
+    --fill: #22211e;
+    --accent: #ff5a1f; /* 6.6:1 sobre --bg */
+    --accent-ink: #0e0e0d;
+    --accent-soft: #3a1a0c;
+    --danger: #ff6b5e;
+    --focus: #f2f1ec;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='oscuro'] {
+  --bg: #0e0e0d;
+  --surface: #161614;
+  --ink: #f2f1ec;
+  --ink-2: #cfcdc5;
+  --muted: #a3a198;
+  --line: #f2f1ec;
+  --line-soft: #3a3935;
+  --fill: #22211e;
+  --accent: #ff5a1f;
+  --accent-ink: #0e0e0d;
+  --accent-soft: #3a1a0c;
+  --danger: #ff6b5e;
+  --focus: #f2f1ec;
+  color-scheme: dark;
+}

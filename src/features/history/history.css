@@ -1,0 +1,35 @@
+.hrow {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  min-height: 64px;
+  padding: 8px 0;
+  text-decoration: none;
+}
+.hrow:hover .hrow__title {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.hrow[aria-current='true'] {
+  background: var(--ink);
+  color: var(--bg);
+  padding-left: 8px;
+  padding-right: 8px;
+}
+.hrow[aria-current='true'] .muted,
+.hrow[aria-current='true'] .eyebrow {
+  color: inherit;
+  opacity: 0.8;
+}
+.hrow__date {
+  display: grid;
+  justify-items: center;
+  line-height: 1;
+  gap: 4px;
+}
+.hrow__title {
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+}
