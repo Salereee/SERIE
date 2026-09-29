@@ -10,6 +10,7 @@ import { Icon } from '../../ui/Icon';
 import { Meta } from '../../ui/Meta';
 import { useStartSession } from '../session/useStartSession';
 import { Builder } from './Builder';
+import { ShareSheet } from './ShareSheet';
 import { DaysTable } from './TemplatePreview';
 import './programs.css';
 
@@ -20,6 +21,7 @@ export function ProgramPage() {
   const navigate = useNavigate();
   const { confirm, toast } = useFeedback();
   const [editingName, setEditingName] = useState(false);
+  const [sharing, setSharing] = useState(false);
   const start = useStartSession();
 
   if (program === null) return null;
@@ -126,6 +128,9 @@ export function ProgramPage() {
                 Activar
               </button>
             )}
+            <button className="btn" onClick={() => setSharing(true)}>
+              Compartir
+            </button>
             <button className="btn" onClick={duplicate}>
               Duplicar
             </button>
@@ -155,6 +160,8 @@ export function ProgramPage() {
 
         </div>
       )}
+
+      {sharing && <ShareSheet program={program} onClose={() => setSharing(false)} />}
 
       <section className="stack" aria-label="Empezar un día">
         <div className="section-head">

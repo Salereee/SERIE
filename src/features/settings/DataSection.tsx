@@ -1,7 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BackupError, backupFilename, downloadBlob, exportAndDownload, exportBackup, importBackup, readBackupFile, wipeAll, type ImportMode, type ImportResult } from '../../db/backup';
+import { BackupError, backupFilename, downloadBlob, exportAndDownload, exportAndShare, exportBackup, importBackup, readBackupFile, wipeAll, type ImportMode, type ImportResult } from '../../db/backup';
 import { db } from '../../db/db';
 import { hasDemoData, loadDemoData, removeDemoData } from '../../db/demo';
 import { useSettings } from '../../db/hooks';
@@ -59,6 +59,8 @@ export function DataSection() {
       // Copia de seguridad automática de lo que hay ahora, antes de escribir.
       const previous = await exportBackup();
       const result = await importBackup(imp.backup, mode);
+      // En un dispositivo nuevo, tener datos importados basta para saltar la bienvenida.
+      if (!(await db.settings.get('app'))?.onboardingDone) await db.settings.update('app', { onboardingDone: true });
       setImp({ step: 'hecho', result, mode, previous });
     } catch {
       toast({ message: 'La importación falló y no se cambió nada.', durationMs: 7000 });
@@ -136,6 +138,23 @@ export function DataSection() {
           />
         </div>
         {activeSession > 0 && <span className="small muted">Termina la sesión en curso para poder importar.</span>}
+      </Row>
+
+      <Row
+        title="Pasar todo a otro dispositivo"
+        hint="Para ver tu historial en la computadora o en otro celular. Aquí: toca Enviar respaldo y mándatelo por WhatsApp, correo, AirDrop o Drive. Allá: abre SERIE → Ajustes → Datos y respaldo → Importar JSON y elige Reemplazar (si allá no tienes nada) o Fusionar. Solo la rutina: Programas → Compartir."
+      >
+        <div className="cluster">
+          <button
+            className="btn btn--sm"
+            onClick={async () => {
+              const r = await exportAndShare();
+              if (r === 'descargado') toast({ message: 'Respaldo descargado: ábrelo en el otro dispositivo con Importar JSON' });
+            }}
+          >
+            Enviar respaldo
+          </button>
+        </div>
       </Row>
 
       <Row title="Datos de ejemplo" hint="Historial falso de un Torso/Pierna para probar gráficas, récords y sugerencias. Se quita sin tocar tus datos reales.">

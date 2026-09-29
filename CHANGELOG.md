@@ -2,6 +2,19 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/); versiones con [SemVer](https://semver.org/lang/es/). La versión actual se ve en **Ajustes**.
 
+## [1.1.0] — 2026-09-28
+
+Pasar rutinas y datos entre dispositivos sin cuentas, y licencia MIT.
+
+### Compartir entre dispositivos
+- **Compartir rutina:** en cada programa, un enlace y un código QR con la rutina (días, ejercicios, series, reps, descansos y supersets). Sirve para verla en la computadora, pasarla a otro celular o dársela a alguien. La rutina viaja comprimida dentro del enlace, en la parte `#`, que no llega a ningún servidor; no incluye historial ni notas.
+- **Abrir una rutina compartida** (`/importar`): se revisa antes de guardar, se agrega como rutina nueva sin tocar nada existente y funciona en un dispositivo que nunca ha usado SERIE (salta la bienvenida). Los ejercicios propios de la rutina se crean también.
+- **Enviar respaldo:** en Ajustes → Datos y respaldo, abre el menú de compartir del sistema con el archivo (WhatsApp, correo, AirDrop, Drive); si el navegador no puede, lo descarga. Con los pasos para importarlo en el otro dispositivo.
+- La bienvenida ofrece “Importar tu respaldo” para quien ya usa SERIE en otro equipo, y un respaldo importado en un dispositivo nuevo salta la bienvenida.
+
+### Licencia
+- Código abierto con licencia MIT (`LICENSE`), mencionada en el README y en Ajustes → Acerca de.
+
 ## [1.0.2] — 2026-09-28
 
 Nuevo hogar en GitHub Pages (`/SERIE/`), funciones pequeñas para la sesión, orden de la interfaz y material de lanzamiento. Los datos guardados siguen siendo compatibles: los campos nuevos son opcionales.

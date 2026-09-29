@@ -145,6 +145,12 @@ export function OnboardingPage() {
             Cargar datos de ejemplo
           </button>
         </p>
+        <p className="small muted">
+          ¿Ya usas SERIE en otro dispositivo?{' '}
+          <Link className="link-btn" to="/ajustes#datos">
+            Importar tu respaldo
+          </Link>
+        </p>
       </div>
     );
   }

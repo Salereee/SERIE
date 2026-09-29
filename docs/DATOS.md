@@ -69,6 +69,16 @@ Ejemplo: queremos guardar la **duración de cada serie** (`durationSec`) y poder
 
 Si alguien tiene la app abierta en dos pestañas y una de ellas carga una versión nueva del esquema, la otra recibe el evento `versionchange`: cierra su conexión y muestra “SERIE se actualizó en otra pestaña · Recargar” (`src/db/storageErrors.ts`). Así la migración no queda bloqueada.
 
+## Compartir una rutina por enlace
+
+`Programas → Compartir` produce `https://…/importar#r=<datos>`:
+
+- `<datos>` es JSON compacto (`{ v, n, d: [{ n, i: [[ejercicio, series, repMin, repMax, descanso, superset?]] }], x? }`), comprimido con `deflate-raw` (`CompressionStream`) y en base64url. Una rutina de 4 días y 24 ejercicios ocupa ~480 caracteres.
+- Va en el **fragmento** (`#`): el navegador no lo manda al servidor, así que GitHub Pages nunca ve la rutina.
+- `x` lleva los ejercicios **propios** que usa la rutina (sin su nota). Los predefinidos viajan solo por id.
+- Al abrirlo (`ImportProgramPage`) se valida con los mismos validadores del respaldo, se generan ids nuevos (nunca pisa nada) y un ejercicio propio cuyo id choca con otro distinto recibe un id nuevo. Nada se guarda hasta que el usuario toca **Guardar rutina**.
+- Límite: 16 000 caracteres; formato versionado (`v: 1`). Un enlace de otra versión o dañado muestra un mensaje y no toca la base.
+
 ## Respaldo (formato JSON)
 
 ```jsonc

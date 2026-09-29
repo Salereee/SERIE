@@ -124,3 +124,14 @@ Marca cada casilla al terminar. Si algo no coincide con el resultado esperado, a
   **Esperado:** la nota aparece arriba del ejercicio; también en la ficha de la Biblioteca. Exporta e importa un respaldo: la nota sigue ahí.
 - [ ] **J5. Ayudas del modo básico.** En modo básico toca los “?” (Sugerencia, Volumen, Récords, Calentamiento).
   **Esperado:** una hoja con la explicación. En modo avanzado los “?” no aparecen.
+
+## K. Entre dispositivos (1.1.0)
+
+- [ ] **K1. Rutina al computador.** En el celular: Programas → una rutina → Compartir → Enviar enlace (a ti mismo por WhatsApp o correo). Ábrelo en la computadora.
+  **Esperado:** la computadora muestra la rutina completa; “Guardar rutina” la agrega y, si nunca habías usado SERIE ahí, Hoy ya sugiere su primer día.
+- [ ] **K2. QR a otro celular.** Escanea el QR de Compartir con la cámara de otro teléfono.
+  **Esperado:** abre SERIE con la misma vista previa.
+- [ ] **K3. Enlace cortado.** Borra la mitad del enlace y ábrelo.
+  **Esperado:** “El enlace está incompleto o dañado”; no se guarda nada.
+- [ ] **K4. Todo con historial.** Ajustes → Datos y respaldo → Enviar respaldo. En el otro dispositivo, bienvenida → “Importar tu respaldo” → Importar JSON → Reemplazar.
+  **Esperado:** aparecen sesiones, programas y récords; al volver a Hoy no pide la bienvenida.

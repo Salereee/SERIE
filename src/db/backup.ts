@@ -54,6 +54,27 @@ export async function exportAndDownload() {
   await db.settings.update('app', { lastExportAt: Date.now(), exportReminderSnoozedUntil: undefined });
 }
 
+/**
+ * Para pasar los datos a otro dispositivo: abre el menú de compartir del sistema con el archivo
+ * (WhatsApp, correo, AirDrop, Drive…). Si el navegador no puede compartir archivos, lo descarga.
+ */
+export async function exportAndShare(): Promise<'compartido' | 'descargado' | 'cancelado'> {
+  const blob = await exportBackup();
+  const file = new File([blob], backupFilename(), { type: 'application/json' });
+  let result: 'compartido' | 'descargado' | 'cancelado' = 'descargado';
+  if (navigator.canShare?.({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: 'Respaldo de SERIE' });
+      result = 'compartido';
+    } catch (e) {
+      if ((e as Error)?.name === 'AbortError') return 'cancelado';
+      downloadBlob(blob, file.name);
+    }
+  } else downloadBlob(blob, file.name);
+  await db.settings.update('app', { lastExportAt: Date.now(), exportReminderSnoozedUntil: undefined });
+  return result;
+}
+
 /** Lee y valida el archivo sin tocar la base. Lanza BackupError con un mensaje en español. */
 export async function readBackupFile(file: File): Promise<ValidBackup> {
   if (file.size > MAX_BACKUP_BYTES) {

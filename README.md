@@ -20,6 +20,7 @@
   <img alt="React 18" src="https://img.shields.io/badge/React-18-f2f1ec?style=flat-square&labelColor=0e0e0d&logo=react">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-f2f1ec?style=flat-square&labelColor=0e0e0d&logo=typescript">
   <img alt="Vite" src="https://img.shields.io/badge/Vite-8-f2f1ec?style=flat-square&labelColor=0e0e0d&logo=vite">
+  <img alt="Licencia MIT" src="https://img.shields.io/badge/licencia-MIT-f2f1ec?style=flat-square&labelColor=0e0e0d">
 </p>
 
 # SERIE — registro de rutinas de gimnasio
@@ -168,7 +169,9 @@ Se controlan con variables de entorno: en GitHub Pages, en el paso **Build** de 
 
 ## Limitaciones conocidas
 
-- **Los datos son por dispositivo, por navegador y por dominio.** El celular y la computadora no comparten datos; tampoco `localhost` y el sitio publicado, ni `algo.pages.dev` y un dominio propio. Para mover datos: Ajustes → Exportar / Importar.
+- **Los datos son por dispositivo, por navegador y por dominio.** El celular y la computadora no comparten datos solos; tampoco `localhost` y el sitio publicado. No hay sincronización automática porque eso requiere cuentas y un servidor. Hay dos formas de pasar datos:
+  - **Solo la rutina:** Programas → una rutina → **Compartir**. Genera un enlace (y un QR) que lleva la rutina comprimida en el fragmento `#` de la URL, que el navegador no envía al servidor. Quien lo abre la revisa y la guarda como rutina nueva, aunque nunca haya usado SERIE. Ver `src/domain/shareProgram.ts`.
+  - **Todo, con historial:** Ajustes → Datos y respaldo → **Enviar respaldo** (menú de compartir del sistema, o descarga) y en el otro dispositivo **Importar JSON**. La bienvenida también ofrece “Importar tu respaldo”.
 - **Sin sincronización ni cuentas**: es a propósito (privacidad), pero implica que si pierdes el dispositivo y no tienes respaldo, pierdes los datos.
 - **Safari en iOS puede borrar los datos** de un sitio que no visitas en varias semanas si no está instalado. Instálalo en la pantalla de inicio (la app lo explica) y exporta respaldos.
 - **iOS no tiene vibración** en el navegador: el fin del descanso se avisa con sonido y con un destello de pantalla y cambio de color.
@@ -197,3 +200,7 @@ Más detalle del modelo de datos en [`docs/DATOS.md`](docs/DATOS.md). Historial 
 ## Stack
 
 Vite + React 18 + TypeScript, Dexie 4 (IndexedDB), React Router 7, @dnd-kit, vite-plugin-pwa (Workbox). Gráficas en SVG propio. Fuentes Space Grotesk y JetBrains Mono autoalojadas (subset latino, woff2).
+
+## Licencia
+
+[MIT](LICENSE) © 2026 Ángel Armando Arellano González. Puedes usar, copiar, modificar y distribuir el código, incluso con fines comerciales, siempre que conserves el aviso de copyright y la licencia.

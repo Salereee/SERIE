@@ -38,7 +38,7 @@
     'q5':'Can I use my own exercises and routines?','a5':'Yes. Beyond the 99 built-in exercises you can add your own, and in advanced mode you build your split with drag and drop, supersets, warm-ups and RIR/RPE.',
     'q6':'Pounds or kilos?','a6':'Both. Switch units in Settings and the app converts your history.',
     'fin.eyebrow':'Your next session','fin.l1':'Start today.','fin.l2':'Log every set',
-    'foot':'v1.0.2 · 2026 · Free, no account',
+    'foot':'v1.1.0 · 2026 · Free, no account',
     'alt.hoy':'SERIE Today screen: Legs B day with six exercises and a Start button (app UI in Spanish)',
     'alt.ses':'Deadlift session: two 115 kg sets logged, plates per side and rest timer at 2:25 (app UI in Spanish)',
     'alt.ex':'Lat pulldown progress: top weight goes from 50 to 55 kg (app UI in Spanish)',

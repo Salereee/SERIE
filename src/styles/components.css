@@ -1067,3 +1067,43 @@ body:has(.rest) .toasts {
   line-height: 1.55;
   font-size: 16px;
 }
+
+/* Casilla con texto: toda la fila es tocable (44 px). */
+.check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.check input {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  accent-color: var(--ink);
+}
+
+/* Compartir rutina: pasos, QR sobre blanco (legible con cualquier tema) y acciones. */
+.share {
+  display: grid;
+  gap: 18px;
+}
+.share__steps {
+  display: grid;
+  gap: 8px;
+  padding-left: 20px;
+  line-height: 1.45;
+}
+.share__qr {
+  justify-self: start;
+  width: min(240px, 70vw);
+  padding: 8px;
+  background: #fff;
+  border: var(--b2);
+}
+.qr {
+  display: block;
+  width: 100%;
+  height: auto;
+}

@@ -72,7 +72,7 @@ function oneOf(v: unknown, path: string, values: readonly unknown[], optional = 
 const ts = (v: unknown, path: string, optional = false) => num(v, path, MIN_TS, MAX_TS, { optional });
 const id = (v: unknown, path: string) => str(v, path, 100);
 
-function validateExercise(v: unknown, p: string): Exercise {
+export function validateExercise(v: unknown, p: string): Exercise {
   const o = obj(v, p, ['id', 'name', 'primaryMuscle', 'secondaryMuscles', 'equipment', 'kind', 'region', 'isCustom', 'archived', 'custom', 'note'], ['id', 'name', 'primaryMuscle', 'secondaryMuscles', 'equipment', 'kind', 'region', 'isCustom']);
   id(o.id, `${p}.id`);
   str(o.name, `${p}.name`);
@@ -89,7 +89,7 @@ function validateExercise(v: unknown, p: string): Exercise {
   return o as unknown as Exercise;
 }
 
-function validateProgram(v: unknown, p: string): Program {
+export function validateProgram(v: unknown, p: string): Program {
   const o = obj(v, p, ['id', 'name', 'templateKey', 'equipmentProfile', 'days', 'createdAt', 'updatedAt', 'isDemo'], ['id', 'name', 'days', 'createdAt', 'updatedAt']);
   id(o.id, `${p}.id`);
   str(o.name, `${p}.name`);

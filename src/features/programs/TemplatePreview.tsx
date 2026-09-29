@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useExerciseMap } from '../../db/hooks';
-import type { ProgramDay, Questionnaire } from '../../db/schema';
+import type { Exercise, ProgramDay, Questionnaire } from '../../db/schema';
 import { TEMPLATE_BY_KEY, buildDays, type TemplateKey } from '../../db/seed/programs';
 import { fmtClock } from '../../domain/format';
 import { ShowMore } from '../../ui/ShowMore';
@@ -21,8 +21,10 @@ export function TemplatePreview({ templateKey, q, compact }: { templateKey: Temp
   );
 }
 
-export function DaysTable({ days, compact, wide }: { days: ProgramDay[]; compact?: boolean; wide?: boolean }) {
-  const ex = useExerciseMap();
+export function DaysTable({ days, compact, wide, extra }: { days: ProgramDay[]; compact?: boolean; wide?: boolean; extra?: Exercise[] }) {
+  const local = useExerciseMap();
+  // `extra`: ejercicios que aún no existen aquí (p. ej. los propios de una rutina compartida).
+  const ex = extra?.length ? new Map([...local, ...extra.map((e) => [e.id, e] as const)]) : local;
   return (
     <div className={`days-table${compact ? ' days-table--compact' : ''}${wide ? ' days-table--wide' : ''}`}>
       {days.map((d, i) => (

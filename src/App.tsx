@@ -4,6 +4,7 @@ import { useActiveSession, useSettings } from './db/hooks';
 import { fmtDateLong } from './domain/format';
 import { LibraryPage } from './features/library/LibraryPage';
 import { OnboardingPage } from './features/onboarding/OnboardingPage';
+import { ImportProgramPage } from './features/programs/ImportProgramPage';
 import { ProgramPage } from './features/programs/ProgramPage';
 import { ProgramsPage } from './features/programs/ProgramsPage';
 import { LiveBar } from './features/session/LiveBar';
@@ -144,6 +145,7 @@ export function App() {
           <Route path="/biblioteca" element={<LibraryPage />} />
           <Route path="/ajustes" element={<SettingsPage />} />
           <Route path="/mas" element={<MorePage />} />
+          <Route path="/importar" element={<ImportProgramPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         </Suspense>
