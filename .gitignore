@@ -12,3 +12,4 @@ dev-dist
 .wrangler/
 *.tsbuildinfo
 dist-gh
+docs/img/.tmp

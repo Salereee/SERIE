@@ -1,3 +1,27 @@
+<h1 align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/hero-oscuro.png">
+  <source media="(prefers-color-scheme: light)" srcset="docs/img/hero-claro.png">
+  <img alt="SERIE — Cada serie, anotada. Capturas de las pantallas Hoy y Sesión" src="docs/img/hero-oscuro.png" width="100%">
+</picture>
+</h1>
+
+<p align="center">
+  <a href="https://salereee.github.io/serie/"><b>Abrir la app</b></a> ·
+  <a href="https://salereee.github.io/serie/inicio/">Página del proyecto</a> ·
+  <a href="#correr-en-local">Correr en local</a> ·
+  <a href="CHANGELOG.md">Cambios</a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/Salereee/serie/actions/workflows/pages.yml"><img alt="Despliegue en GitHub Pages" src="https://github.com/Salereee/serie/actions/workflows/pages.yml/badge.svg"></a>
+  <img alt="PWA instalable" src="https://img.shields.io/badge/PWA-instalable-ff5a1f?style=flat-square&labelColor=0e0e0d">
+  <img alt="Sin cuentas" src="https://img.shields.io/badge/datos-solo_en_tu_dispositivo-f2f1ec?style=flat-square&labelColor=0e0e0d">
+  <img alt="React 18" src="https://img.shields.io/badge/React-18-f2f1ec?style=flat-square&labelColor=0e0e0d&logo=react">
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-f2f1ec?style=flat-square&labelColor=0e0e0d&logo=typescript">
+  <img alt="Vite" src="https://img.shields.io/badge/Vite-8-f2f1ec?style=flat-square&labelColor=0e0e0d&logo=vite">
+</p>
+
 # SERIE — registro de rutinas de gimnasio
 
 App web para planear splits y registrar entrenamientos: series, peso, reps, descansos, récords y progreso. **Todo se guarda en tu dispositivo** (IndexedDB): sin cuentas, sin servidor. Se instala como app y funciona sin conexión después de la primera visita.
@@ -5,6 +29,28 @@ App web para planear splits y registrar entrenamientos: series, peso, reps, desc
 - Interfaz en español de México, para celular y escritorio.
 - Modo básico (cuestionario → split recomendado) y avanzado (constructor, RIR/RPE, supersets).
 - Timer de descanso, récords en vivo, sobrecarga progresiva sugerida, gráficas de progreso.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/principios-oscuro.png">
+  <source media="(prefers-color-scheme: light)" srcset="docs/img/principios-claro.png">
+  <img alt="Sin cuentas: abres y entrenas. Sin servidor: tus datos viven en tu navegador. Sin conexión: funciona sin señal después de la primera visita." src="docs/img/principios-oscuro.png" width="100%">
+</picture>
+
+## Pantallas
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/pantallas-oscuro.png">
+  <source media="(prefers-color-scheme: light)" srcset="docs/img/pantallas-claro.png">
+  <img alt="Cuatro pantallas en celular: Hoy, Sesión, progreso por ejercicio y Progreso" src="docs/img/pantallas-oscuro.png" width="100%">
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/escritorio-oscuro.png">
+  <source media="(prefers-color-scheme: light)" srcset="docs/img/escritorio-claro.png">
+  <img alt="SERIE en computadora: barra lateral, día de hoy, semana y récords recientes" src="docs/img/escritorio-oscuro.png" width="100%">
+</picture>
+
+<sub>Capturas reales con los datos de ejemplo de la app (Ajustes → Datos y respaldo). Las imágenes se regeneran con <code>node scripts/readme-visuals.mjs</code>.</sub>
 
 ## Requisitos
 
