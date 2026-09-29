@@ -1,0 +1,15 @@
+{
+  "_nota": "Agrega estos campos al objeto manifest de VitePWA en vite.config.ts. Las capturas activan la ventana de instalación enriquecida en Android/Chrome.",
+  "screenshots": [
+    { "src": "/screenshots/movil-1-hoy.png", "sizes": "1080x2337", "type": "image/png", "form_factor": "narrow", "label": "Hoy: tu día de entrenamiento" },
+    { "src": "/screenshots/movil-2-sesion.png", "sizes": "1080x2337", "type": "image/png", "form_factor": "narrow", "label": "Sesión activa con timer de descanso" },
+    { "src": "/screenshots/movil-3-progreso.png", "sizes": "1080x2337", "type": "image/png", "form_factor": "narrow", "label": "Progreso por ejercicio y 1RM" },
+    { "src": "/screenshots/movil-4-historial.png", "sizes": "1080x2337", "type": "image/png", "form_factor": "narrow", "label": "Historial de sesiones" },
+    { "src": "/screenshots/escritorio-1-hoy.png", "sizes": "1920x1200", "type": "image/png", "form_factor": "wide", "label": "SERIE en computadora" },
+    { "src": "/screenshots/escritorio-2-sesion.png", "sizes": "1920x1200", "type": "image/png", "form_factor": "wide", "label": "Sesión en computadora" }
+  ],
+  "shortcuts": [
+    { "name": "Empezar sesión", "short_name": "Entrenar", "url": "/", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Ver progreso", "short_name": "Progreso", "url": "/progreso", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

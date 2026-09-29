@@ -11,3 +11,4 @@ dev-dist
 .vscode/
 .wrangler/
 *.tsbuildinfo
+dist-gh

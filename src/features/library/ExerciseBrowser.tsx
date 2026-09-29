@@ -4,6 +4,7 @@ import { EQUIPMENT_LABEL, MUSCLE_LABEL } from '../../db/schema';
 import { Disclosure, ToggleAll, useOpenSections } from '../../ui/Disclosure';
 import { Icon } from '../../ui/Icon';
 import { Select } from '../../ui/Select';
+import { ShowMore } from '../../ui/ShowMore';
 import { EQUIPMENT_OPTIONS, useExerciseGroups } from './useExerciseFilter';
 import './library.css';
 
@@ -45,9 +46,11 @@ export function ExerciseBrowser({ onPick, selectedId }: Props) {
         <div className="section-tools">
           <Select label="Equipo" value={equipment} options={EQUIPMENT_OPTIONS} onChange={setEquipment} />
           <span className="cluster">
-            <span className="eyebrow mono" aria-live="polite">
-              {filtering ? `${count} de ${total}` : `${total} ejercicios`}
-            </span>
+            {filtering && (
+              <span className="eyebrow mono" aria-live="polite">
+                {count} de {total}
+              </span>
+            )}
             {!filtering && <ToggleAll allOpen={allOpen} onChange={(o) => setAll(ids, o)} />}
           </span>
         </div>
@@ -83,7 +86,13 @@ export function ExerciseBrowser({ onPick, selectedId }: Props) {
               open={filtering || isOpen(g.key)}
               onToggle={(o) => !filtering && setOpen(g.key, o)}
             >
-              <ExerciseList items={g.items} onPick={onPick} selectedId={selectedId} />
+              {filtering ? (
+                <ExerciseList items={g.items} onPick={onPick} selectedId={selectedId} />
+              ) : (
+                <ShowMore items={g.items} limit={6} noun="ejercicios">
+                  {(visible) => <ExerciseList items={visible} onPick={onPick} selectedId={selectedId} />}
+                </ShowMore>
+              )}
             </Disclosure>
           ))}
       </div>

@@ -38,7 +38,7 @@ export class ErrorBoundary extends Component<Props, { error: Error | null; expor
             seguir. Si se repite, exporta un respaldo por precaución.
           </p>
           <div className="cluster">
-            <a className="btn btn--primary" href="/">
+            <a className="btn btn--primary" href={import.meta.env.BASE_URL}>
               Ir a Hoy
             </a>
             <button

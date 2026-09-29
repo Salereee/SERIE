@@ -57,6 +57,10 @@ export function About({ onClose }: { onClose: () => void }) {
             </tbody>
           </table>
           <p className="small muted">Las fuentes se incluyen en la app; no se cargan desde servicios externos.</p>
+          {/* Enlace normal (no <Link>): /inicio/ es una página estática fuera de la app. */}
+          <p className="small muted">
+            ¿Quieres recomendar SERIE? Comparte la <a href={`${import.meta.env.BASE_URL}inicio/`}>página de presentación</a>.
+          </p>
         </section>
       </div>
     </Sheet>

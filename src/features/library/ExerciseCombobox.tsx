@@ -18,6 +18,8 @@ interface Props {
   tools?: React.ReactNode;
   autoFocus?: boolean;
   label?: string;
+  /** Sin búsqueda, cada grupo muestra solo estos y un botón "Ver los N". */
+  limitPerGroup?: number;
 }
 
 /**
@@ -25,15 +27,28 @@ interface Props {
  * El foco se queda en el campo: ↑↓ mueven la opción activa, Inicio/Fin saltan, Enter elige.
  * Esc lo maneja la hoja que lo contiene (cierra y devuelve el foco al control que la abrió).
  */
-export function ExerciseCombobox({ groups, query, onQuery, onPick, tools, autoFocus, label = 'Buscar ejercicio' }: Props) {
+export function ExerciseCombobox({ groups: allGroups, query, onQuery, onPick, tools, autoFocus, label = 'Buscar ejercicio', limitPerGroup }: Props) {
   const id = useId();
   const listId = `${id}-list`;
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const searching = query.trim() !== '';
+  // Grupos recortados: al buscar se ve todo; si no, los primeros de cada grupo (y el teclado solo recorre lo visible).
+  const groups = useMemo(
+    () =>
+      allGroups.map((g) => {
+        const cut = !!limitPerGroup && !searching && !expanded.has(g.key) && g.items.length > limitPerGroup + 2;
+        return { ...g, all: g.items.length, cut, items: cut ? g.items.slice(0, limitPerGroup) : g.items };
+      }),
+    [allGroups, limitPerGroup, searching, expanded],
+  );
   const flat = useMemo(() => groups.flatMap((g) => g.items.map((e) => ({ e, group: g.key }))), [groups]);
   const [active, setActive] = useState(0);
   const listRef = useRef<HTMLDivElement>(null);
 
   // Al cambiar los resultados, la primera opción queda activa.
-  useEffect(() => setActive(0), [query, groups]);
+  // Solo cuando cambian de verdad los resultados (no en cada render del padre).
+  const signature = allGroups.map((g) => `${g.key}:${g.items.length}`).join('|');
+  useEffect(() => setActive(0), [query, signature]);
 
   useEffect(() => {
     listRef.current?.querySelector(`#${CSS.escape(`${id}-o${active}`)}`)?.scrollIntoView({ block: 'nearest' });
@@ -88,10 +103,10 @@ export function ExerciseCombobox({ groups, query, onQuery, onPick, tools, autoFo
         {groups
           .filter((g) => g.items.length)
           .map((g) => (
-            <div key={g.key} role="group" aria-labelledby={`${id}-g-${g.key}`} className="combo__group">
+            <div key={g.key} role="group" aria-labelledby={`${id}-g-${g.key}`} className={`combo__group${g.cut ? ' combo__group--cut' : ''}`}>
               <div id={`${id}-g-${g.key}`} className="combo__label" role="presentation">
                 <span>{g.label}</span>
-                <span className="mono">{g.items.length}</span>
+                <span className="mono">{g.all}</span>
               </div>
               {g.items.map((e) => {
                 i++;
@@ -117,6 +132,18 @@ export function ExerciseCombobox({ groups, query, onQuery, onPick, tools, autoFo
                   </div>
                 );
               })}
+              {g.cut && (
+                <button
+                  type="button"
+                  className="showmore__btn combo__more"
+                  onClick={() => setExpanded((x) => new Set(x).add(g.key))}
+                  aria-label={`Ver los ${g.all} ejercicios de ${g.label}`}
+                >
+                  <span>Ver los {g.all}</span>
+                  <span className="mono small muted">+{g.all - g.items.length}</span>
+                  <Icon name="down" size={16} className="showmore__chev" />
+                </button>
+              )}
             </div>
           ))}
       </div>

@@ -4,11 +4,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { db } from '../../db/db';
 import { useActiveSession, useExerciseMap, useSettings } from '../../db/hooks';
 import type { Exercise, ExerciseLog, PRKind, Session, SessionExercise, SetEntry, Settings } from '../../db/schema';
+import { showsAdvancedMetrics, showsEffort } from '../../db/schema';
 import { EQUIPMENT_LABEL, MUSCLE_LABEL } from '../../db/schema';
 import { fmtClock, fmtDateShort, fmtRelativeDay } from '../../domain/format';
 import { setsVolume, workSets } from '../../domain/logs';
 import { suggest, type Suggestion } from '../../domain/progression';
-import { computeRecords, PR_LABEL, setPRs, type Records } from '../../domain/records';
+import { computeRecords, prLabel, setPRs, type Records } from '../../domain/records';
 import { fmtVolume, fmtWeight } from '../../domain/units';
 import { haptic, sfx, unlockAudio } from '../../hooks/audio';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
@@ -43,6 +44,7 @@ import { SetRow } from './SetRow';
 import { accordionState } from './accordion';
 import { useSessionLock } from './useSessionLock';
 import './session.css';
+import './session-accordion.css';
 
 export function SessionPage() {
   const session = useActiveSession();
@@ -134,7 +136,7 @@ function ActiveSession({ session }: { session: Session }) {
     return () => clearTimeout(t);
   }, [focus]);
   const current = session.exercises[focus];
-  const advanced = settings.mode === 'avanzado';
+  const effort = showsEffort(settings);
 
   const totals = useMemo(() => {
     let done = 0;
@@ -172,7 +174,7 @@ function ActiveSession({ session }: { session: Session }) {
             sfx('pr');
             haptic([30, 60, 30]);
           }, 140);
-          toast({ tone: 'pr', message: `Récord · ${kinds.map((k) => PR_LABEL[k]).join(' + ')} · ${name}`, durationMs: 4500 });
+          toast({ tone: 'pr', message: `Récord · ${kinds.map((k) => prLabel(k, showsAdvancedMetrics(settings))).join(' + ')} · ${name}`, durationMs: 4500 });
         }
       }
     }
@@ -320,7 +322,7 @@ function ActiveSession({ session }: { session: Session }) {
                   open={extra.isOpen('historial')}
                   onToggle={(o) => extra.setOpen('historial', o)}
                 >
-                  <HistoryBlock logs={history.by.get(current.exerciseId) ?? []} records={history.recs.get(current.exerciseId)} unit={settings.unit} />
+                  <HistoryBlock logs={history.by.get(current.exerciseId) ?? []} records={history.recs.get(current.exerciseId)} unit={settings.unit} advanced={showsAdvancedMetrics(settings)} />
                 </Disclosure>
                 <Disclosure
                   title="Notas de la sesión"
@@ -339,7 +341,7 @@ function ActiveSession({ session }: { session: Session }) {
               {current && (
                 <>
                   <span className="eyebrow">{exMap.get(current.exerciseId)?.name}</span>
-                  <HistoryBlock logs={history.by.get(current.exerciseId) ?? []} records={history.recs.get(current.exerciseId)} unit={settings.unit} />
+                  <HistoryBlock logs={history.by.get(current.exerciseId) ?? []} records={history.recs.get(current.exerciseId)} unit={settings.unit} advanced={showsAdvancedMetrics(settings)} />
                 </>
               )}
               <NotesBlock session={session} />
@@ -373,7 +375,7 @@ function ActiveSession({ session }: { session: Session }) {
           session={session}
           exIdx={setMenu.ex}
           setIdx={setMenu.set}
-          advanced={advanced}
+          advanced={effort}
           onClose={() => setSetMenu(null)}
           onRemove={async () => {
             const snapshot = structuredClone(session.exercises[setMenu.ex]);
@@ -516,7 +518,7 @@ interface PanelProps {
 
 function ExercisePanel({ session, index, ex, exercise, logs, records, settings, onToggle, onPatch, onSetMenu, onExMenu, onAddSet }: PanelProps) {
   const unit = settings.unit;
-  const advanced = settings.mode === 'avanzado';
+  const advanced = showsEffort(settings);
   const last = logs[0];
   const sug = useMemo(
     () =>
@@ -649,7 +651,7 @@ function ExercisePanel({ session, index, ex, exercise, logs, records, settings, 
   );
 }
 
-function HistoryBlock({ logs, records, unit }: { logs: ExerciseLog[]; records?: Records; unit: Settings['unit'] }) {
+function HistoryBlock({ logs, records, unit, advanced }: { logs: ExerciseLog[]; records?: Records; unit: Settings['unit']; advanced: boolean }) {
   if (logs.length === 0) {
     return (
       <section className="side-block">
@@ -674,13 +676,20 @@ function HistoryBlock({ logs, records, unit }: { logs: ExerciseLog[]; records?: 
               <span className="unit">{unit}</span>
             </span>
           </div>
-          <div className="stat">
-            <span className="eyebrow">1RM est.</span>
-            <span className="num-md">
-              {fmtWeight(records.best1RM, unit)}
-              <span className="unit">{unit}</span>
-            </span>
-          </div>
+          {advanced ? (
+            <div className="stat">
+              <span className="eyebrow">1RM est.</span>
+              <span className="num-md">
+                {fmtWeight(records.best1RM, unit)}
+                <span className="unit">{unit}</span>
+              </span>
+            </div>
+          ) : (
+            <div className="stat">
+              <span className="eyebrow">Sesiones</span>
+              <span className="num-md">{logs.length}</span>
+            </div>
+          )}
         </div>
       )}
       <div className="section-head" style={{ marginTop: 16 }}>

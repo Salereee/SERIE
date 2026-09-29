@@ -1,1 +1,12 @@
-/* /index.html 200
+# Sin reglas a propósito.
+#
+# Las rutas de la app (/progreso, /historial/123…) las resuelve el modo SPA propio de Cloudflare Pages:
+# si el proyecto no tiene un 404.html en la raíz, Pages responde index.html a cualquier ruta que no sea
+# un archivo. Vite no genera 404.html, así que no hace falta una regla.
+#
+# No uses "/* /index.html 200":
+#  - Pages la descarta al publicar ("Infinite loop detected in this rule and has been ignored").
+#  - Si se aplicara, taparía /inicio/: en _redirects las reglas se siguen aunque exista el archivo
+#    ("Redirects are always followed, regardless of whether or not an asset matches the incoming request").
+#
+# /inicio y /inicio/ sirven public/inicio/index.html (la página de presentación) como archivo estático.

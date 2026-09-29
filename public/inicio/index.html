@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SERIE — Cada serie, anotada.</title>
+<meta name="description" content="Registra tus rutinas de gimnasio, series y récords. Gratis y sin cuentas: tus datos se guardan solo en tu dispositivo.">
+<meta name="theme-color" content="#F2F1EC" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E0E0D" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<!-- Página de presentación, servida en /inicio/ junto a la app (mismo origen, misma CSP estricta):
+     sin estilos ni scripts en línea, fuentes autoalojadas y rutas relativas (./ y ../), así sirve igual
+     en la raíz de un dominio y en una subruta como GitHub Pages (/serie/inicio/). Es un archivo estático de public/: Vite no lo procesa,
+     por eso aquí no se reemplaza %SITE_URL%. -->
+<!-- Open Graph y canonical deberían ser URL absolutas (og:url se omite por eso); requieren el dominio real.
+     Cuando exista, cambia "" y "/og.png" por https://<tu-dominio>/inicio/ y https://<tu-dominio>/og.png. -->
+<link rel="canonical" href="./">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_MX">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:site_name" content="SERIE">
+<meta property="og:title" content="SERIE — Cada serie, anotada.">
+<meta property="og:description" content="Registro de rutinas de gimnasio. Gratis, sin cuentas y sin conexión.">
+<meta property="og:image" content="../og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SERIE: Cada serie, anotada.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.ico" sizes="48x48">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="preload" href="fonts/space-grotesk-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="inicio.css">
+<script defer src="inicio.js"></script>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#inicio" aria-label="SERIE"><i aria-hidden="true"></i>SERIE</a>
+    <nav>
+      <a class="link" href="#funciones" data-i="nav.feat">Funciones</a>
+      <a class="link" href="#privacidad" data-i="nav.priv">Privacidad</a>
+      <a class="link" href="#instalar" data-i="nav.install">Instalar</a>
+      <div class="lang" role="group" aria-label="Idioma / Language">
+        <button type="button" id="lang-es" data-lang="es" aria-pressed="true">ES</button>
+        <button type="button" id="lang-en" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+      <a class="btn btn--primary app-link" href="../" data-i="cta.short">Abrir</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap" id="inicio">
+  <div class="hero">
+    <div>
+      <div class="folio"><span class="eyebrow eyebrow--ink" data-i="hero.eyebrow">Registro de entrenamiento</span><span class="eyebrow" data-i="hero.folio">N.º 01 · v1.0</span></div>
+      <h1><span data-i="hero.l1">Cada serie,</span><span><span data-i="hero.l2">anotada</span><span class="dot">.</span></span></h1>
+      <div class="ruler" aria-hidden="true"></div>
+      <p class="lead" data-i="hero.lead">Planea tu split, registra peso y reps en un toque y mira cómo subes. Gratis, sin cuentas y sin internet: todo se queda en tu teléfono.</p>
+      <div class="ctas">
+        <a class="btn btn--primary app-link" href="../"><span data-i="cta.open">Abrir SERIE</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn btn--ghost" href="#instalar" data-i="cta.install">Cómo instalarla</a>
+      </div>
+      <div class="facts">
+        <div><b>99</b><span data-i="f.ex">ejercicios con nombres de gym mexicano</span></div>
+        <div><b>6</b><span data-i="f.splits">splits recomendados</span></div>
+        <div><b>0</b><span data-i="f.acc">cuentas o correos</span></div>
+        <div><b>$0</b><span data-i="f.price">para siempre</span></div>
+      </div>
+    </div>
+    <figure class="phone">
+      <img class="only-light" src="img/hoy-claro.webp" width="780" height="1688" alt="Pantalla Hoy de SERIE: día Pierna B con seis ejercicios y el botón Empezar" data-i-alt="alt.hoy">
+      <img class="only-dark" src="img/hoy.webp" width="780" height="1688" alt="Pantalla Hoy de SERIE: día Pierna B con seis ejercicios y el botón Empezar" data-i-alt="alt.hoy">
+      <figcaption class="phone__cap"><span class="eyebrow" data-i="cap.today">Hoy · Pierna B</span><span class="eyebrow mono">390 × 844</span></figcaption>
+      <div class="timer" role="timer" aria-label="Descanso de ejemplo" data-i-aria="timer.aria">
+        <span class="eyebrow" data-i="timer.label">Descanso · Peso muerto</span>
+        <b id="clock">2:30</b>
+        <div class="bar"><i id="bar"></i></div>
+      </div>
+    </figure>
+  </div>
+
+  <section aria-labelledby="como">
+    <div class="sec-head">
+      <span class="eyebrow eyebrow--ink" data-i="how.eyebrow">Cómo funciona</span>
+      <div><h2 id="como" data-i="how.title">Tres pasos, sin registrarte.</h2></div>
+    </div>
+    <div class="steps">
+      <div class="step"><span class="num" aria-hidden="true">01</span><h3 data-i="s1.t">Responde 4 preguntas</h3><p data-i="s1.p">Días disponibles, experiencia, objetivo y equipo. SERIE te recomienda un split: Full Body, Torso/Pierna, PPL, PHUL, Arnold o Bro Split. Si prefieres, arma el tuyo.</p></div>
+      <div class="step"><span class="num" aria-hidden="true">02</span><h3 data-i="s2.t">Entrena y anota</h3><p data-i="s2.p">Cada serie llega prellenada con lo de la última vez. Toca para registrarla y el descanso empieza solo.</p></div>
+      <div class="step"><span class="num" aria-hidden="true">03</span><h3 data-i="s3.t">Mira tu progreso</h3><p data-i="s3.p">Récords en vivo, 1RM estimado, frecuencia semanal y volumen por grupo muscular. Te sugiere cuándo subir peso y cuándo descargar.</p></div>
+    </div>
+  </section>
+
+  <section id="funciones" aria-labelledby="funciones-t">
+    <div class="sec-head">
+      <span class="eyebrow eyebrow--ink" data-i="feat.eyebrow">Funciones</span>
+      <div><h2 id="funciones-t" data-i="feat.title">Hecha para usarse entre series.</h2><p data-i="feat.lead">Botones grandes, números legibles a un brazo de distancia y la pantalla encendida mientras entrenas.</p></div>
+    </div>
+
+    <article class="feat">
+      <div>
+        <span class="eyebrow" data-i="a.eyebrow">Sesión activa</span>
+        <h3 data-i="a.t">Una serie, un toque<span class="dot">.</span></h3>
+        <p data-i="a.p">Peso y reps prellenados, historial de la última vez a la vista y una sugerencia concreta para la siguiente serie.</p>
+        <ul>
+          <li><span data-i="a.1">Descanso automático</span><span>±15 s</span></li>
+          <li><span data-i="a.2">Aviso de fin</span><span data-i="a.2v">sonido + destello</span></li>
+          <li><span data-i="a.3">Récords</span><span data-i="a.3v">en vivo</span></li>
+          <li><span data-i="a.4">Avanzado</span><span>RIR / RPE · supersets</span></li>
+        </ul>
+      </div>
+      <figure class="feat__img bottom">
+        <img class="only-light" src="img/sesion-claro.webp" width="780" height="1688" alt="Sesión de peso muerto con tres series de 110 kg registradas y el descanso en 2:27" data-i-alt="alt.ses" loading="lazy">
+        <img class="only-dark" src="img/sesion.webp" width="780" height="1688" alt="Sesión de peso muerto con tres series de 110 kg registradas y el descanso en 2:27" data-i-alt="alt.ses" loading="lazy">
+      </figure>
+    </article>
+
+    <article class="feat">
+      <div>
+        <span class="eyebrow" data-i="b.eyebrow">Progreso por ejercicio</span>
+        <h3 data-i="b.t">Mira cómo vas subiendo<span class="dot">.</span></h3>
+        <p data-i="b.p">Cada ejercicio guarda su peso máximo, su mejor volumen y su 1RM estimado con la fórmula de Epley. La gráfica marca en color cada récord.</p>
+        <ul>
+          <li><span>1RM</span><span data-i="b.1v">peso × (1 + reps / 30)</span></li>
+          <li><span data-i="b.2">Sobrecarga progresiva</span><span data-i="b.2v">sugerida, opcional</span></li>
+          <li><span data-i="b.3">Unidades</span><span>kg · lb</span></li>
+        </ul>
+      </div>
+      <figure class="feat__img">
+        <img class="only-light" src="img/ejercicio-claro.webp" width="780" height="1688" alt="Progreso de sentadilla con barra: peso máximo 80 kg, 1RM estimado 104 kg" data-i-alt="alt.ex" loading="lazy">
+        <img class="only-dark" src="img/ejercicio.webp" width="780" height="1688" alt="Progreso de sentadilla con barra: peso máximo 80 kg, 1RM estimado 104 kg" data-i-alt="alt.ex" loading="lazy">
+      </figure>
+    </article>
+
+    <article class="feat">
+      <div>
+        <span class="eyebrow" data-i="c.eyebrow">Constancia</span>
+        <h3 data-i="c.t">Tu racha, a la vista<span class="dot">.</span></h3>
+        <p data-i="c.p">Sesiones del mes, promedio por semana, racha de semanas seguidas y un calendario de 16 semanas. Abajo, el volumen de cada grupo muscular.</p>
+      </div>
+      <figure class="feat__img">
+        <img class="only-light" src="img/progreso-claro.webp" width="780" height="1688" alt="Resumen de progreso: 14 sesiones en 30 días, racha de 10 semanas" data-i-alt="alt.prog" loading="lazy">
+        <img class="only-dark" src="img/progreso.webp" width="780" height="1688" alt="Resumen de progreso: 14 sesiones en 30 días, racha de 10 semanas" data-i-alt="alt.prog" loading="lazy">
+      </figure>
+    </article>
+
+    <figure class="desk">
+      <img class="only-light" src="img/escritorio-claro.webp" width="1600" height="1000" alt="SERIE en computadora con barra lateral, día de hoy y récords recientes" data-i-alt="alt.desk" loading="lazy">
+      <img class="only-dark" src="img/escritorio.webp" width="1600" height="1000" alt="SERIE en computadora con barra lateral, día de hoy y récords recientes" data-i-alt="alt.desk" loading="lazy">
+      <figcaption><span class="eyebrow eyebrow--ink" data-i="desk.cap">También en computadora</span><span class="eyebrow" data-i="desk.cap2">Tema claro y oscuro · navegación con teclado</span></figcaption>
+    </figure>
+  </section>
+
+  <section id="privacidad" aria-labelledby="priv-t">
+    <div class="priv">
+      <div>
+        <span class="eyebrow eyebrow--ink" data-i="p.eyebrow">Privacidad</span>
+        <h2 id="priv-t" data-i="p.title">Sin cuentas. Tus datos, tuyos.</h2>
+        <p class="priv__lead" data-i="p.lead">SERIE no tiene servidor. Lo que registras vive en la base de datos de tu navegador y no sale de tu dispositivo.</p>
+        <p class="note" data-i="p.note">Como no hay nube, el celular y la computadora no comparten datos. Para cambiar de dispositivo, exporta un respaldo desde Ajustes e impórtalo en el otro.</p>
+      </div>
+      <ol>
+        <li data-i="p.1">Sin registro, correo ni contraseña</li>
+        <li data-i="p.2">Guardado local en IndexedDB</li>
+        <li data-i="p.3">Funciona sin conexión después de la primera visita</li>
+        <li data-i="p.4">Se instala como app en iPhone y Android</li>
+        <li data-i="p.5">Respaldo en archivo JSON cuando quieras</li>
+        <li data-i="p.6">Sin anuncios ni rastreadores de terceros</li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="instalar" aria-labelledby="inst-t">
+    <div class="sec-head">
+      <span class="eyebrow eyebrow--ink" data-i="i.eyebrow">Instalar</span>
+      <div><h2 id="inst-t" data-i="i.title">Ponla en tu pantalla de inicio.</h2><p data-i="i.lead">No hace falta tienda de apps. Abre SERIE en el navegador y agrégala en tres toques.</p></div>
+    </div>
+    <div class="install">
+      <div>
+        <span class="eyebrow">iPhone · Safari</span>
+        <h3>iOS</h3>
+        <ol>
+          <li data-i="ios.1">Toca <b>Compartir</b> (el cuadro con la flecha hacia arriba).</li>
+          <li data-i="ios.2">Desliza y elige <b>Agregar a inicio</b>.</li>
+          <li data-i="ios.3">Confirma con <b>Agregar</b> y ábrela desde el ícono nuevo.</li>
+        </ol>
+        <p class="note" data-i="ios.note">En iPhone, instalarla importa: si solo la usas dentro de Safari y pasan semanas sin abrirla, iOS puede borrar sus datos.</p>
+      </div>
+      <div>
+        <span class="eyebrow">Android · Chrome</span>
+        <h3>Android</h3>
+        <ol>
+          <li data-i="and.1">Abre SERIE en Chrome.</li>
+          <li data-i="and.2">Toca <b>Instalar app</b> en el aviso, o en el menú <b>⋮</b>.</li>
+          <li data-i="and.3">Confirma. Queda en tu cajón de apps como cualquier otra.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="faq-t">
+    <div class="sec-head">
+      <span class="eyebrow eyebrow--ink" data-i="q.eyebrow">Preguntas</span>
+      <div><h2 id="faq-t" data-i="q.title">Lo que suelen preguntar.</h2></div>
+    </div>
+    <div class="faq">
+      <details><summary data-i="q1">¿Cuánto cuesta?</summary><p data-i="a1">Nada. SERIE es gratis, sin plan de pago ni anuncios.</p></details>
+      <details><summary data-i="q2">¿Necesito crear una cuenta?</summary><p data-i="a2">No. Abres la app y empiezas. No pide correo, teléfono ni contraseña.</p></details>
+      <details><summary data-i="q3">¿Qué pasa si cambio de celular?</summary><p data-i="a3">Antes de cambiar, ve a Ajustes → Exportar para guardar un archivo de respaldo. En el teléfono nuevo, abre SERIE y usa Importar. La app también te recuerda hacer respaldo cada 14 días o 10 sesiones.</p></details>
+      <details><summary data-i="q4">¿Funciona sin internet?</summary><p data-i="a4">Sí. Después de la primera visita funciona sin conexión, así que el sótano del gym no es problema.</p></details>
+      <details><summary data-i="q5">¿Puedo usar mis propios ejercicios y rutinas?</summary><p data-i="a5">Sí. Además de los 99 ejercicios incluidos puedes crear los tuyos, y en modo avanzado armas tu split con arrastrar y soltar, supersets, calentamientos y RIR/RPE.</p></details>
+      <details><summary data-i="q6">¿Libras o kilos?</summary><p data-i="a6">Las dos. Cambia la unidad en Ajustes y la app convierte tu historial.</p></details>
+    </div>
+  </section>
+
+  <section class="final" aria-labelledby="fin-t">
+    <span class="eyebrow eyebrow--ink" data-i="fin.eyebrow">Tu próxima sesión</span>
+    <h2 id="fin-t"><span data-i="fin.l1">Empieza hoy.</span><br><span data-i="fin.l2">Anota cada serie</span><span class="dot">.</span></h2>
+    <div class="ruler" aria-hidden="true"></div>
+    <div class="ctas">
+      <a class="btn btn--primary app-link" href="../"><span data-i="cta.open">Abrir SERIE</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="brand brand--sm"><i aria-hidden="true"></i>SERIE</span>
+    <span class="eyebrow" data-i="foot">v1.0.0 · 2026 · Gratis y sin cuentas</span>
+  </div>
+</footer>
+
+
+</body>
+</html>

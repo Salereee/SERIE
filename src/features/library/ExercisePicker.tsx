@@ -38,6 +38,7 @@ export function ExercisePicker({ title = 'Agregar ejercicio', onClose, onPick, i
         groups={comboGroups}
         query={q}
         onQuery={setQ}
+        limitPerGroup={5}
         autoFocus
         onPick={(e) => {
           onPick(e);

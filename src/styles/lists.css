@@ -1,0 +1,68 @@
+/* ——— Listas largas recortadas con desvanecido ——— */
+
+.showmore__list {
+  position: relative;
+}
+/* Desvanecido con máscara: no depende del color de fondo, así sirve en claro y oscuro. */
+.showmore[data-cut] > .showmore__list {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 88px), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 88px), transparent);
+}
+.showmore:not([data-cut]) > .showmore__list > * > :nth-child(n + 6) {
+  animation: enter-rise var(--t-base) var(--ease) both;
+}
+.showmore__btn {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  margin-top: -8px;
+  padding: 0 2px;
+  border-top: var(--b1);
+  font-weight: 700;
+  font-size: 14px;
+  text-align: left;
+  transition: background-color var(--t-press) ease;
+}
+.showmore[data-cut] > .showmore__btn {
+  margin-top: -28px;
+  border-top-color: transparent;
+}
+.showmore__chev {
+  justify-self: end;
+  transition: transform var(--t-base) var(--ease);
+}
+.showmore__btn[aria-expanded='true'] .showmore__chev {
+  transform: rotate(180deg);
+}
+.showmore__btn:active {
+  background: var(--fill);
+}
+@media (hover: hover) and (pointer: fine) {
+  .showmore__btn:hover span:first-child {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+/* Selector de ejercicios: el último visible de un grupo recortado se desvanece hacia el botón. */
+.combo__group--cut > .ex-row:nth-last-of-type(1) {
+  -webkit-mask-image: linear-gradient(to bottom, #000 10%, rgb(0 0 0 / 0.15));
+  mask-image: linear-gradient(to bottom, #000 10%, rgb(0 0 0 / 0.15));
+}
+/* Navegación de semana en Progreso: la etiqueta nunca se parte. */
+.weeknav .mono {
+  white-space: nowrap;
+}
+.combo__more {
+  margin-top: 0;
+  border-top: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .showmore__chev {
+    transition: none;
+  }
+}

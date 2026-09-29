@@ -1,25 +1,82 @@
+/* ——— Ajustes: más aire entre opciones, texto y controles bien separados ——— */
+
+.settings {
+  gap: 32px;
+}
+
 .srow {
   display: grid;
-  gap: 12px;
-  padding: 16px 0 18px;
+  gap: 14px;
+  padding: 20px 0 22px;
   border-top: var(--b1);
-}
-.settings .span-6 > .srow:first-child {
-  border-top: var(--b2);
 }
 .srow__text {
   display: grid;
-  gap: 4px;
+  gap: 6px;
+}
+.srow__text p {
+  max-width: 58ch;
+  line-height: 1.5;
 }
 .srow__ctrl {
   display: grid;
-  gap: 8px;
-  max-width: 440px;
+  gap: 12px;
+  max-width: 460px;
+}
+/* Botones que se acomodan en varias filas: separación también vertical. */
+.srow__ctrl .cluster {
+  gap: 12px;
 }
 .settings__pair {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 16px;
+}
+.settings__toggles {
+  gap: 12px 20px;
+}
+
+/* Rápidos: Modo, Unidad y Tema siempre visibles. */
+.settings__quick {
+  display: grid;
+  border-top: var(--b2);
+}
+.settings__quick > .srow:first-child {
+  border-top: 0;
+}
+@media (min-width: 900px) {
+  .settings__quick {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 40px;
+  }
+  .settings__quick > .srow {
+    border-top: 0;
+    align-content: space-between;
+  }
+}
+
+/* Grupos desplegables: una columna en celular, dos en escritorio. */
+.settings__groups {
+  display: grid;
+  gap: 0;
+}
+.settings__col {
+  display: grid;
+  align-content: start;
+}
+@media (min-width: 900px) {
+  .settings__groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 48px;
+  }
+}
+/* Dentro de un grupo, la primera opción no repite la regla del encabezado. */
+.settings .disc__inner > .srow:first-child {
+  border-top: 0;
+  padding-top: 8px;
+}
+.settings .disc {
+  margin-bottom: 8px;
 }
 
 .toggle {
@@ -27,7 +84,7 @@
   align-items: center;
   gap: 10px;
   min-height: 44px;
-  padding: 0 12px 0 0;
+  padding: 0 4px 0 0;
   font-weight: 600;
 }
 .toggle__box {

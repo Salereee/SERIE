@@ -33,6 +33,8 @@ export function Builder({ program }: { program: Program }) {
   const [picker, setPicker] = useState<{ dayId: string; replaceItemId?: string } | null>(null);
   const [menu, setMenu] = useState<{ dayId: string; itemId: string } | null>(null);
   const [dayMenu, setDayMenu] = useState<string | null>(null);
+  // Filas compactas: solo un ejercicio abierto a la vez para editar series, reps y descanso.
+  const [openItem, setOpenItem] = useState<string | null>(null);
   const ex = useExerciseMap();
   const settings = useSettings();
   const { toast, confirm } = useFeedback();
@@ -133,6 +135,8 @@ export function Builder({ program }: { program: Program }) {
                 }
                 onMove={(from, to) => save((p) => void ((p.days[idx].items = arrayMove(p.days[idx].items, from, to)), cleanSupersets(p.days[idx])))}
                 onItemMenu={(itemId) => setMenu({ dayId: d.id, itemId })}
+                openItem={openItem}
+                onOpenItem={(itemId, o) => setOpenItem(o ? itemId : null)}
                 onToggleSuperset={(i) =>
                   save((p) => {
                     const items = p.days[idx].items;
@@ -185,7 +189,9 @@ export function Builder({ program }: { program: Program }) {
                 it.exerciseId = e.id;
               } else {
                 const iso = e.kind === 'aislamiento';
-                day.items.push({ id: uid(), exerciseId: e.id, targetSets: 3, repMin: iso ? 10 : 8, repMax: iso ? 15 : 12, restSec: settings.defaultRestSec });
+                const id = uid();
+                setOpenItem(id);
+                day.items.push({ id, exerciseId: e.id, targetSets: 3, repMin: iso ? 10 : 8, repMax: iso ? 15 : 12, restSec: settings.defaultRestSec });
               }
             })
           }
@@ -349,9 +355,11 @@ interface DayColumnProps {
   onMove: (from: number, to: number) => void;
   onItemMenu: (itemId: string) => void;
   onToggleSuperset: (index: number) => void;
+  openItem: string | null;
+  onOpenItem: (itemId: string, open: boolean) => void;
 }
 
-function DayColumn({ day, index, desktop, exName, onRename, onAdd, onMenu, onItem, onMove, onItemMenu, onToggleSuperset }: DayColumnProps) {
+function DayColumn({ day, index, desktop, exName, onRename, onAdd, onMenu, onItem, onMove, onItemMenu, onToggleSuperset, openItem, onOpenItem }: DayColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id: `day:${day.id}` });
   return (
     <section className="bday" aria-label={day.name}>
@@ -392,6 +400,8 @@ function DayColumn({ day, index, desktop, exName, onRename, onAdd, onMenu, onIte
               onDown={() => onMove(i, i + 1)}
               onMenu={() => onItemMenu(it.id)}
               onToggleSuperset={() => onToggleSuperset(i)}
+              open={openItem === it.id}
+              onOpen={(o) => onOpenItem(it.id, o)}
             />
           ))}
         </ol>
@@ -416,9 +426,11 @@ interface ItemProps {
   onDown: () => void;
   onMenu: () => void;
   onToggleSuperset: () => void;
+  open: boolean;
+  onOpen: (open: boolean) => void;
 }
 
-function BuilderItem({ item, index, count, name, desktop, superset, linkedToNext, onChange, onUp, onDown, onMenu, onToggleSuperset }: ItemProps) {
+function BuilderItem({ item, index, count, name, desktop, superset, linkedToNext, onChange, onUp, onDown, onMenu, onToggleSuperset, open, onOpen }: ItemProps) {
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
   const [min, setMin] = useState(String(item.repMin));
   const [max, setMax] = useState(String(item.repMax));
@@ -431,6 +443,9 @@ function BuilderItem({ item, index, count, name, desktop, superset, linkedToNext
     }
   };
   const id = item.id.slice(0, 8);
+  // Con reps inválidas la fila no se cierra: el error queda a la vista.
+  const expanded = open || !valid;
+  const summary = `${item.targetSets} × ${item.repMin}–${item.repMax} · ${fmtClock(item.restSec)}`;
 
   return (
     <li
@@ -438,6 +453,7 @@ function BuilderItem({ item, index, count, name, desktop, superset, linkedToNext
       className="bitem"
       data-dragging={isDragging || undefined}
       data-superset={superset}
+      data-open={expanded || undefined}
       style={{ transform: CSS.Transform.toString(transform), transition }}
     >
       <div className="bitem__top">
@@ -450,86 +466,94 @@ function BuilderItem({ item, index, count, name, desktop, superset, linkedToNext
             {String(index + 1).padStart(2, '0')}
           </span>
         )}
-        <span className="bitem__name">
-          {superset && <span className="tag" style={{ marginRight: 6 }}>SS</span>}
-          {name}
-        </span>
+        <button className="bitem__toggle" aria-expanded={expanded} aria-controls={`b-${id}`} onClick={() => onOpen(!open)}>
+          <span className="bitem__name">
+            {superset && <span className="tag" style={{ marginRight: 6 }}>SS</span>}
+            {name}
+          </span>
+          <span className="bitem__sum mono">{summary}</span>
+          <Icon name="down" size={16} className="bitem__chev" />
+        </button>
         <button className="btn btn--ghost btn--icon" onClick={onMenu} aria-label={`Opciones de ${name}`}>
           <Icon name="more" />
         </button>
       </div>
-      <div className="bitem__fields">
-        <div className="field">
-          <label className="field__label" htmlFor={`s-${id}`}>
-            Series
-          </label>
-          <select id={`s-${id}`} className="select input--num" value={item.targetSets} onChange={(e) => onChange({ targetSets: Number(e.target.value) })}>
-            {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
-              <option key={n} value={n}>
-                {n}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="field">
-          <span className="field__label" id={`r-${id}`}>
-            Reps
-          </span>
-          <div className="bitem__range" role="group" aria-labelledby={`r-${id}`}>
-            <input
-              className="input input--num"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              aria-label="Reps mínimas"
-              value={min}
-              onChange={(e) => setMin(e.target.value.replace(/\D/g, ''))}
-              onBlur={commit}
-              aria-invalid={!valid}
-            />
-            <span aria-hidden="true">–</span>
-            <input
-              className="input input--num"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              aria-label="Reps máximas"
-              value={max}
-              onChange={(e) => setMax(e.target.value.replace(/\D/g, ''))}
-              onBlur={commit}
-              aria-invalid={!valid}
-            />
+      {expanded && (
+        <div className="bitem__body" id={`b-${id}`}>
+          <div className="bitem__fields">
+            <div className="field">
+              <label className="field__label" htmlFor={`s-${id}`}>
+                Series
+              </label>
+              <select id={`s-${id}`} className="select input--num" value={item.targetSets} onChange={(e) => onChange({ targetSets: Number(e.target.value) })}>
+                {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="field">
+              <span className="field__label" id={`r-${id}`}>
+                Reps
+              </span>
+              <div className="bitem__range" role="group" aria-labelledby={`r-${id}`}>
+                <input
+                  className="input input--num"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  aria-label="Reps mínimas"
+                  value={min}
+                  onChange={(e) => setMin(e.target.value.replace(/\D/g, ''))}
+                  onBlur={commit}
+                  aria-invalid={!valid}
+                />
+                <span aria-hidden="true">–</span>
+                <input
+                  className="input input--num"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  aria-label="Reps máximas"
+                  value={max}
+                  onChange={(e) => setMax(e.target.value.replace(/\D/g, ''))}
+                  onBlur={commit}
+                  aria-invalid={!valid}
+                />
+              </div>
+            </div>
+            <div className="field">
+              <label className="field__label" htmlFor={`d-${id}`}>
+                Descanso
+              </label>
+              <select id={`d-${id}`} className="select input--num" value={item.restSec} onChange={(e) => onChange({ restSec: Number(e.target.value) })}>
+                {[...new Set([...REST_OPTIONS, item.restSec])].sort((a, b) => a - b).map((s) => (
+                  <option key={s} value={s}>
+                    {fmtClock(s)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          {!valid && <span className="field__error">Reps: enteros, mínimo ≥ 1 y máximo ≥ mínimo.</span>}
+          <div className="bitem__actions">
+            {!desktop && (
+              <>
+                <button className="btn btn--sm" onClick={onUp} disabled={index === 0} aria-label={`Subir ${name}`}>
+                  <Icon name="up" />
+                </button>
+                <button className="btn btn--sm" onClick={onDown} disabled={index === count - 1} aria-label={`Bajar ${name}`}>
+                  <Icon name="down" />
+                </button>
+              </>
+            )}
+            {index < count - 1 && (
+              <button className="btn btn--sm btn--ghost" onClick={onToggleSuperset} aria-pressed={linkedToNext}>
+                <Icon name="link" size={16} /> {linkedToNext ? 'Separar superset' : 'Superset con siguiente'}
+              </button>
+            )}
           </div>
         </div>
-        <div className="field">
-          <label className="field__label" htmlFor={`d-${id}`}>
-            Descanso
-          </label>
-          <select id={`d-${id}`} className="select input--num" value={item.restSec} onChange={(e) => onChange({ restSec: Number(e.target.value) })}>
-            {[...new Set([...REST_OPTIONS, item.restSec])].sort((a, b) => a - b).map((s) => (
-              <option key={s} value={s}>
-                {fmtClock(s)}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-      {!valid && <span className="field__error">Reps: enteros, mínimo ≥ 1 y máximo ≥ mínimo.</span>}
-      <div className="bitem__actions">
-        {!desktop && (
-          <>
-            <button className="btn btn--sm" onClick={onUp} disabled={index === 0} aria-label={`Subir ${name}`}>
-              <Icon name="up" />
-            </button>
-            <button className="btn btn--sm" onClick={onDown} disabled={index === count - 1} aria-label={`Bajar ${name}`}>
-              <Icon name="down" />
-            </button>
-          </>
-        )}
-        {index < count - 1 && (
-          <button className="btn btn--sm btn--ghost" onClick={onToggleSuperset} aria-pressed={linkedToNext}>
-            <Icon name="link" size={16} /> {linkedToNext ? 'Separar superset' : 'Superset con siguiente'}
-          </button>
-        )}
-      </div>
+      )}
     </li>
   );
 }

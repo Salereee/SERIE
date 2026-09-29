@@ -63,9 +63,10 @@ function ruler(x, y, width, color, step = 12, big = 5) {
   return d;
 }
 
-function iconSvg(size, { maskable = false } = {}) {
+function iconSvg(size, { maskable = false, favicon = false } = {}) {
   // En íconos "maskable" el sistema recorta hasta un 20 %: la marca va más chica.
-  const s = size * (maskable ? 0.56 : 0.72);
+  // En el favicon (16–48 px) va más grande para que se lea en la pestaña.
+  const s = size * (maskable ? 0.56 : favicon ? 0.9 : 0.72);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
     <rect width="${size}" height="${size}" fill="${INK}"/>
     ${mark(size / 2, size / 2, s)}
@@ -104,5 +105,5 @@ await png(iconSvg(512), pub('icons/icon-512.png'));
 await png(iconSvg(512, { maskable: true }), pub('icons/icon-maskable-512.png'));
 await png(iconSvg(180), pub('apple-touch-icon.png'));
 await png(ogSvg(), pub('og.png'));
-writeFileSync(pub('favicon.svg'), iconSvg(32).replace(/\n\s*/g, ''));
+writeFileSync(pub('favicon.svg'), iconSvg(32, { favicon: true }).replace(/\n\s*/g, ''));
 console.log('✓ ./public/favicon.svg');

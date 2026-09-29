@@ -88,3 +88,26 @@ Marca cada casilla al terminar. Si algo no coincide con el resultado esperado, a
   **Esperado:** carga la pantalla de Progreso (no un 404).
 - [ ] **H3. Compartir.** Pega el enlace en WhatsApp (con `VITE_SITE_URL` configurada).
   **Esperado:** vista previa con la imagen negra “Cada serie, anotada.”
+- [ ] **H4. Buscadores.** Con `ALLOW_INDEXING=true` y `VITE_SITE_URL`, abre `https://<tu-sitio>/robots.txt` y `https://<tu-sitio>/sitemap.xml`.
+  **Esperado:** `robots.txt` termina en `Sitemap: https://<tu-sitio>/sitemap.xml`; el sitemap lista `/` y `/inicio/` con la fecha del deploy. Sin esas variables: `Disallow: /` y `sitemap.xml` no existe (Pages devuelve la app).
+- [ ] **H5. Instalación enriquecida (Android/Chrome o Chrome de escritorio).** Abre el sitio sin instalar y usa “Instalar”.
+  **Esperado:** el diálogo muestra las capturas (verticales en celular, horizontales en escritorio). Con la app instalada, mantener presionado el ícono ofrece “Ver progreso” e “Historial”, y cada uno abre esa pantalla.
+
+## I. Página de presentación (`/inicio/`)
+
+- [ ] **I1. Rutas.** Abre `https://<tu-sitio>/inicio/` y `https://<tu-sitio>/inicio` (sin barra).
+  **Esperado:** ambas muestran la página de presentación (“Cada serie, anotada.”, botones ES/EN), no la app. Recarga: sigue igual.
+- [ ] **I2. CSP y fuentes.** En DevTools → Console y Network, recarga `/inicio/`.
+  **Esperado:** ningún error de CSP; las fuentes salen de `/inicio/fonts/` (nada de `fonts.googleapis.com` ni `fonts.gstatic.com`); ninguna respuesta 404.
+- [ ] **I3. Idioma.** Toca **EN** y luego **ES**; recarga.
+  **Esperado:** cambian textos, título de la pestaña y textos alternativos de las imágenes; al recargar se conserva el último idioma elegido.
+- [ ] **I4. Tema.** Cambia el sistema entre claro y oscuro.
+  **Esperado:** las capturas cambian a su versión clara u oscura; los textos se leen bien en ambos.
+- [ ] **I5. Abrir la app.** Toca “Abrir SERIE” (arriba, en el hero y al final).
+  **Esperado:** abre la app en `/` del mismo sitio (con tus datos, si ya la usabas en ese navegador).
+- [ ] **I6. Con la app instalada.** En un teléfono con SERIE instalada, abre `https://<tu-sitio>/inicio/` en el navegador.
+  **Esperado:** se ve la página de presentación, no la app. Sin conexión no carga (no se guarda para uso offline); es lo esperado.
+- [ ] **I7. Enlace desde la app.** Ajustes → Acerca de → “página de presentación”.
+  **Esperado:** abre `/inicio/`.
+- [ ] **I8. Compartir.** Pega `https://<tu-sitio>/inicio/` en WhatsApp.
+  **Esperado:** puede salir sin imagen mientras `og:image` de `public/inicio/index.html` sea relativa (`/og.png`); con URL absoluta, sale la imagen negra “Cada serie, anotada.”

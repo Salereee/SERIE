@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { db } from '../../db/db';
 import { useExerciseLogs, useSettings } from '../../db/hooks';
-import { EQUIPMENT_LABEL, MUSCLE_LABEL, type Exercise } from '../../db/schema';
+import { EQUIPMENT_LABEL, MUSCLE_LABEL, showsAdvancedMetrics, type Exercise } from '../../db/schema';
 import { fmtRelativeDay } from '../../domain/format';
 import { computeRecords } from '../../domain/records';
 import { fmtWeight } from '../../domain/units';
@@ -73,7 +73,9 @@ export function LibraryPage() {
 
 function ExerciseDetail({ exercise: e, onEdit, onDeleted, hideTitle }: { exercise: Exercise; onEdit: () => void; onDeleted: () => void; hideTitle?: boolean }) {
   const logs = useExerciseLogs(e.id) ?? [];
-  const { unit } = useSettings();
+  const settings = useSettings();
+  const { unit } = settings;
+  const advanced = showsAdvancedMetrics(settings);
   const { confirm, toast } = useFeedback();
   const rec = computeRecords(logs);
 
@@ -121,9 +123,9 @@ function ExerciseDetail({ exercise: e, onEdit, onDeleted, hideTitle }: { exercis
       {logs.length > 0 ? (
         <div className="stat-row" style={{ '--cols': 2 } as React.CSSProperties}>
           <div className="stat">
-            <span className="eyebrow">1RM estimado</span>
+            <span className="eyebrow">{advanced ? '1RM estimado' : 'Peso máximo'}</span>
             <span className="num-md">
-              {fmtWeight(rec.best1RM, unit)}
+              {fmtWeight(advanced ? rec.best1RM : rec.bestWeight, unit)}
               <span className="unit">{unit}</span>
             </span>
           </div>

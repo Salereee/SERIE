@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { db } from '../../db/db';
@@ -7,7 +8,9 @@ import { fmtDuration, fmtMonthYear } from '../../domain/format';
 import { fmtVolume } from '../../domain/units';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useFeedback } from '../../ui/feedback';
+import { Disclosure, ToggleAll, useOpenSections } from '../../ui/Disclosure';
 import { Icon } from '../../ui/Icon';
+import { ShowMore } from '../../ui/ShowMore';
 import { deleteFinishedSession } from '../session/actions';
 import { SessionReport } from '../session/SummaryPage';
 import '../session/summary.css';
@@ -70,45 +73,70 @@ export function HistoryPage() {
 
 function SessionList({ sessions, selectedId }: { sessions: Session[]; selectedId?: string }) {
   const { unit } = useSettings();
-  const groups: { label: string; items: Session[] }[] = [];
+  const groups: { key: string; label: string; items: Session[] }[] = [];
   for (const s of sessions) {
     const label = fmtMonthYear(s.startedAt);
     const g = groups[groups.length - 1];
     if (g && g.label === label) g.items.push(s);
-    else groups.push({ label, items: [s] });
+    else groups.push({ key: label, label, items: [s] });
   }
+  // El mes más reciente abierto; los anteriores cerrados con su resumen.
+  const newest = groups[0]?.key;
+  const defaults = useCallback((id: string) => id === newest, [newest]);
+  const { isOpen, setOpen, setAll } = useOpenSections('historial', defaults);
+  const ids = groups.map((g) => g.key);
+  const allOpen = ids.every(isOpen);
+
   return (
-    <div className="stack" style={{ '--gap': '20px' } as React.CSSProperties}>
-      {groups.map((g) => (
-        <section key={g.label} aria-label={g.label}>
-          <div className="section-head">
-            <h2 className="eyebrow eyebrow--ink">{g.label}</h2>
-            <span className="eyebrow mono">{g.items.length}</span>
-          </div>
-          <ul className="list">
-            {g.items.map((s) => {
-              const d = new Date(s.startedAt);
-              return (
-                <li key={s.id}>
-                  <Link to={`/historial/${s.id}`} className="hrow" aria-current={s.id === selectedId || undefined}>
-                    <span className="hrow__date">
-                      <span className="num-md">{String(d.getDate()).padStart(2, '0')}</span>
-                      <span className="eyebrow">{d.toLocaleDateString('es-MX', { weekday: 'short' }).replace('.', '')}</span>
-                    </span>
-                    <span className="stack" style={{ '--gap': '2px' } as React.CSSProperties}>
-                      <span className="hrow__title">{s.dayName}</span>
-                      <span className="small muted mono">
-                        {fmtDuration(s.durationSec ?? 0)} · {fmtVolume(s.summary?.volumeKg ?? 0, unit)} {unit} · {s.summary?.setsDone ?? 0} series
-                      </span>
-                    </span>
-                    {(s.summary?.prs.length ?? 0) > 0 && <span className="tag tag--accent">{s.summary!.prs.length} PR</span>}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      ))}
+    <div className="stack" style={{ '--gap': '0' } as React.CSSProperties}>
+      {groups.length > 1 && (
+        <div className="section-tools" style={{ paddingBottom: 8 }}>
+          <span className="eyebrow">Por mes</span>
+          <ToggleAll allOpen={allOpen} onChange={(o) => setAll(ids, o)} />
+        </div>
+      )}
+      {groups.map((g) => {
+        const vol = g.items.reduce((a, s) => a + (s.summary?.volumeKg ?? 0), 0);
+        const prs = g.items.reduce((a, s) => a + (s.summary?.prs.length ?? 0), 0);
+        return (
+          <Disclosure
+            key={g.key}
+            sticky
+            lazy
+            title={g.label}
+            summary={`${g.items.length} ses. · ${fmtVolume(vol / 1000, unit)} ${unit === 'kg' ? 't' : 'k lb'}${prs ? ` · ${prs} PR` : ''}`}
+            open={isOpen(g.key) || g.items.some((s) => s.id === selectedId)}
+            onToggle={(o) => setOpen(g.key, o)}
+          >
+            <ShowMore items={g.items} limit={6} noun="sesiones">
+              {(visible) => (
+                <ul className="list">
+                  {visible.map((s) => {
+                    const d = new Date(s.startedAt);
+                    return (
+                      <li key={s.id}>
+                        <Link to={`/historial/${s.id}`} className="hrow" aria-current={s.id === selectedId || undefined}>
+                          <span className="hrow__date">
+                            <span className="num-md">{String(d.getDate()).padStart(2, '0')}</span>
+                            <span className="eyebrow">{d.toLocaleDateString('es-MX', { weekday: 'short' }).replace('.', '')}</span>
+                          </span>
+                          <span className="stack" style={{ '--gap': '2px' } as React.CSSProperties}>
+                            <span className="hrow__title">{s.dayName}</span>
+                            <span className="small muted mono">
+                              {fmtDuration(s.durationSec ?? 0)} · {fmtVolume(s.summary?.volumeKg ?? 0, unit)} {unit} · {s.summary?.setsDone ?? 0} series
+                            </span>
+                          </span>
+                          {(s.summary?.prs.length ?? 0) > 0 && <span className="tag tag--accent">{s.summary!.prs.length} PR</span>}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </ShowMore>
+          </Disclosure>
+        );
+      })}
     </div>
   );
 }

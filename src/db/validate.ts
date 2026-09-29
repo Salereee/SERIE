@@ -186,7 +186,7 @@ function validateSettings(v: unknown, p: string): Settings {
   const o = obj(
     v,
     p,
-    ['id', 'mode', 'unit', 'incrementUpperKg', 'incrementLowerKg', 'defaultRestSec', 'sound', 'vibration', 'theme', 'activeProgramId', 'onboardingDone', 'questionnaire', 'seedVersion', 'lastExportAt', 'exportReminderSnoozedUntil', 'installHintSeen'],
+    ['id', 'mode', 'unit', 'incrementUpperKg', 'incrementLowerKg', 'defaultRestSec', 'sound', 'vibration', 'theme', 'activeProgramId', 'onboardingDone', 'questionnaire', 'seedVersion', 'lastExportAt', 'exportReminderSnoozedUntil', 'installHintSeen', 'effortTracking'],
     ['id', 'mode', 'unit', 'incrementUpperKg', 'incrementLowerKg', 'defaultRestSec', 'sound', 'vibration', 'theme', 'onboardingDone'],
   );
   oneOf(o.id, `${p}.id`, ['app']);
@@ -204,6 +204,7 @@ function validateSettings(v: unknown, p: string): Settings {
   ts(o.lastExportAt, `${p}.lastExportAt`, true);
   ts(o.exportReminderSnoozedUntil, `${p}.exportReminderSnoozedUntil`, true);
   bool(o.installHintSeen, `${p}.installHintSeen`, true);
+  bool(o.effortTracking, `${p}.effortTracking`, true);
   if (o.questionnaire !== undefined) {
     const q = obj(o.questionnaire, `${p}.questionnaire`, ['daysPerWeek', 'experience', 'goal', 'equipment'], ['daysPerWeek', 'experience', 'goal', 'equipment']);
     num(q.daysPerWeek, `${p}.questionnaire.daysPerWeek`, 1, 7, { int: true });

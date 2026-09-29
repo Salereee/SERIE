@@ -9,8 +9,14 @@
     <meta name="theme-color" content="#F2F1EC" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0E0E0D" media="(prefers-color-scheme: dark)" />
     <meta name="color-scheme" content="light dark" />
+    <meta name="keywords" content="rutina gimnasio, registro de entrenamiento, gym tracker, series y repeticiones, 1RM, split, PPL, torso pierna" />
+    <!-- %SITE_URL% lo reemplaza vite.config.ts con VITE_SITE_URL; si está vacía quedan rutas relativas ("/"). -->
+    <link rel="canonical" href="%SITE_URL%/" />
 
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="icon" href="/favicon-16.png" type="image/png" sizes="16x16" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -18,7 +24,9 @@
     <meta name="apple-mobile-web-app-title" content="SERIE" />
 
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="%SITE_URL%/" />
     <meta property="og:locale" content="es_MX" />
+    <meta property="og:locale:alternate" content="en_US" />
     <meta property="og:site_name" content="SERIE" />
     <meta property="og:title" content="SERIE — Cada serie, anotada." />
     <meta property="og:description" content="Registro de rutinas de gimnasio. Sin cuentas: tus datos se quedan en tu dispositivo." />
@@ -27,6 +35,28 @@
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="SERIE: Cada serie, anotada." />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SERIE — Cada serie, anotada." />
+    <meta name="twitter:description" content="Registro de rutinas de gimnasio. Gratis y sin cuentas." />
+    <meta name="twitter:image" content="%SITE_URL%/og.png" />
+
+    <!-- Datos estructurados (schema.org). Es un bloque de datos, no se ejecuta: la CSP (script-src 'self') no lo bloquea. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "SERIE",
+        "url": "%SITE_URL%/",
+        "description": "Registro de rutinas de gimnasio: series, peso, reps, descansos, récords y progreso. Sin cuentas; los datos se guardan en el dispositivo.",
+        "applicationCategory": "HealthApplication",
+        "applicationSubCategory": "Fitness",
+        "operatingSystem": "Web, iOS, Android",
+        "inLanguage": "es-MX",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "MXN" },
+        "image": "%SITE_URL%/og.png",
+        "screenshot": "%SITE_URL%/screenshots/movil-2-sesion.png"
+      }
+    </script>
   </head>
   <body>
     <noscript>SERIE necesita JavaScript activado para funcionar.</noscript>

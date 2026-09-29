@@ -2,7 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { Link, useParams } from 'react-router-dom';
 import { db } from '../../db/db';
 import { useExerciseMap, useSettings } from '../../db/hooks';
-import type { Session } from '../../db/schema';
+import { showsEffort, type Session } from '../../db/schema';
 import { fmtDateLong, fmtDuration, fmtTime } from '../../domain/format';
 import { setsVolume, workSets } from '../../domain/logs';
 import { fmtVolume, fmtWeight } from '../../domain/units';
@@ -46,7 +46,9 @@ export function SummaryPage() {
 
 /** Resumen reutilizable (pantalla final e historial). */
 export function SessionReport({ session, headline }: { session: Session; headline?: boolean }) {
-  const { unit } = useSettings();
+  const settings = useSettings();
+  const { unit } = settings;
+  const effort = showsEffort(settings);
   const ex = useExerciseMap();
   const prs = session.summary?.prs ?? [];
   const prIds = new Set(prs.map((p) => p.exerciseId));
@@ -121,7 +123,7 @@ export function SessionReport({ session, headline }: { session: Session; headlin
                     {e.sets.map((s) => (
                       <span key={s.id} className={s.isWarmup ? 'report__warm' : undefined} title={s.isWarmup ? 'Calentamiento' : undefined}>
                         {fmtWeight(s.weightKg, unit)}×{s.reps}
-                        {s.rir != null ? ` @${s.rir}` : ''}
+                        {effort && s.rir != null ? ` @${s.rir}` : ''}
                       </span>
                     ))}
                   </td>
@@ -131,7 +133,7 @@ export function SessionReport({ session, headline }: { session: Session; headlin
             </tbody>
           </table>
           <p className="small muted" style={{ marginTop: 8 }}>
-            Calentamientos en gris; no cuentan para volumen ni récords.{session.exercises.some((e) => e.sets.some((s) => s.rir != null)) && ' @n = RIR.'}
+            Calentamientos en gris; no cuentan para volumen ni récords.{effort && session.exercises.some((e) => e.sets.some((s) => s.rir != null)) && ' @n = RIR.'}
           </p>
         </section>
       </div>

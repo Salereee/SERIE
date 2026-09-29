@@ -2,6 +2,38 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/); versiones con [SemVer](https://semver.org/lang/es/). La versión actual se ve en **Ajustes**.
 
+## [Sin publicar]
+
+Material de lanzamiento, publicación en GitHub Pages y orden de la interfaz. Los datos guardados no cambian de formato.
+
+### Interfaz
+- Listas largas recortadas con desvanecido y botón “Ver los N…” (Biblioteca, selector de ejercicios, Historial por mes, Progreso, Hoy, recomendación de programa).
+- Sesión activa como acordeón: el ejercicio actual abierto y los demás con su progreso.
+- Constructor de programas con filas compactas que se abren al tocarlas.
+- Ajustes: Modo, Unidad y Tema siempre visibles; el resto en secciones desplegables con más espacio.
+- Hoy: el mapa de 12 semanas queda plegado en celular.
+
+### Modo básico
+- Sin RIR/RPE ni 1RM estimado: se muestra el peso máximo y el récord de 1RM se llama “Mejor serie”.
+- Modo avanzado: nuevo ajuste “Anotar esfuerzo (RIR y RPE)” para quitar la columna de RIR.
+
+### GitHub Pages
+- Workflow que publica en `https://<usuario>.github.io/<repo>/` en cada push a `main`.
+- `BASE_PATH` y `GITHUB_PAGES`: la app funciona en una subruta, con CSP en `<meta>` y `404.html` para enlaces directos.
+- La página de presentación usa rutas relativas.
+
+### Publicación
+- Página de presentación bilingüe (ES/EN) en `/inicio/`: estática, con fuentes autoalojadas y sin estilos ni scripts en línea (cumple la CSP estricta). Enlazada desde Ajustes → Acerca de.
+- `sitemap.xml` (`/` y `/inicio/`) y línea `Sitemap:` en `robots.txt`, solo con `ALLOW_INDEXING=true` y `VITE_SITE_URL` definida.
+- `index.html`: `canonical`, `og:url`, `og:locale:alternate`, `twitter:title/description/image`, palabras clave y datos estructurados `WebApplication` (JSON-LD).
+- `_redirects` sin reglas: las rutas de la app las resuelve el modo SPA de Cloudflare Pages y `/inicio/` se sirve como archivo.
+
+### Instalación
+- Manifest con 6 capturas (celular y escritorio) para la ventana de instalación enriquecida y accesos directos a Progreso e Historial.
+- `favicon.ico` y favicons PNG de 16, 32 y 48 px; `favicon.svg` con la marca más grande para que se lea en la pestaña.
+- Imagen para compartir actualizada (`og.png`) y variante en inglés (`og-en.png`).
+- El service worker no precachea capturas, imágenes para compartir, favicons PNG ni `/inicio/`, y no responde `/inicio` con la app.
+
 ## [1.0.0] — 2026-09-27
 
 Primera versión pública.

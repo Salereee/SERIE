@@ -1,0 +1,53 @@
+# Publica la app en GitHub Pages en cada push a main: https://<usuario>.github.io/<repo>/
+# La página de presentación queda en /<repo>/inicio/.
+name: GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run check:contrast
+      - name: Build
+        run: npx tsc -b && npx vite build
+        env:
+          # Subruta del sitio de proyecto (el nombre del repositorio).
+          BASE_PATH: ${{ github.event.repository.name }}
+          GITHUB_PAGES: 'true'
+          VITE_SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+          # Decisiones pendientes (ver README): sin indexación, sin analítica y sin source maps.
+          ALLOW_INDEXING: ''
+          SOURCEMAP: ''
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

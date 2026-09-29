@@ -1,0 +1,4 @@
+# Úsalo solo cuando ALLOW_INDEXING=true (vite.config.ts ya genera uno; este añade el sitemap).
+User-agent: *
+Allow: /
+Sitemap: https://serie.pages.dev/sitemap.xml

@@ -106,3 +106,6 @@ export const PR_LABEL: Record<PRKind, string> = {
   volumen: 'Volumen',
   reps: 'Reps',
 };
+
+/** En modo básico el 1RM estimado se nombra por lo que es: tu mejor serie combinando peso y reps. */
+export const prLabel = (kind: PRKind, advanced: boolean) => (kind === '1rm' && !advanced ? 'Mejor serie' : PR_LABEL[kind]);

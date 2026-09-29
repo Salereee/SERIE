@@ -4,16 +4,22 @@ import { Link } from 'react-router-dom';
 import { db } from '../../db/db';
 import { useActiveProgram, useActiveSession, useExerciseMap, useSettings } from '../../db/hooks';
 import type { PRHit, Session } from '../../db/schema';
+import { showsAdvancedMetrics } from '../../db/schema';
 import { fmtClock, fmtDateShort, fmtDuration, fmtRelativeDay, startOfDay, startOfWeek } from '../../domain/format';
 import { nextDayIndex } from '../../domain/nextDay';
-import { PR_LABEL } from '../../domain/records';
+import { prLabel } from '../../domain/records';
 import { fmtVolume, fmtWeight } from '../../domain/units';
 import { Icon } from '../../ui/Icon';
 import { Meta } from '../../ui/Meta';
+import { ShowMore } from '../../ui/ShowMore';
 import { BackupReminder } from '../settings/BackupReminder';
 import { Sheet } from '../../ui/Sheet';
 import { useStartSession } from '../session/useStartSession';
 import { WeekHeatmap } from '../progress/charts';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { Disclosure, useOpenSections } from '../../ui/Disclosure';
+
+const closedByDefault = () => false;
 import './today.css';
 
 export function TodayPage() {
@@ -23,6 +29,8 @@ export function TodayPage() {
   const ex = useExerciseMap();
   const start = useStartSession();
   const [pickDay, setPickDay] = useState(false);
+  const desktop = useMediaQuery('(min-width: 900px)');
+  const sections = useOpenSections('hoy', closedByDefault);
   const recent = useLiveQuery(() => db.sessions.orderBy('startedAt').reverse().filter((s) => s.status === 'terminada').limit(40).toArray(), [], [] as Session[]);
 
   const nextIdx = program ? nextDayIndex(program, recent) : -1;
@@ -125,9 +133,18 @@ export function TodayPage() {
               </span>
             </div>
             <WeekStrip sessions={thisWeek} />
-            <div style={{ marginTop: 16 }}>
-              <WeekHeatmap sessions={recent} weeks={12} />
-            </div>
+            {desktop ? (
+              <div style={{ marginTop: 16 }}>
+                <WeekHeatmap sessions={recent} weeks={12} />
+              </div>
+            ) : (
+              // En celular el mapa de 12 semanas es secundario: queda plegado y se recuerda si lo abres.
+              <Disclosure variant="row" className="today__heat" title={<span className="eyebrow eyebrow--ink">Últimas 12 semanas</span>} open={sections.isOpen('mapa')} onToggle={(o) => sections.setOpen('mapa', o)} lazy>
+                <div style={{ padding: '4px 0 12px' }}>
+                  <WeekHeatmap sessions={recent} weeks={12} />
+                </div>
+              </Disclosure>
+            )}
           </section>
 
           <section aria-labelledby="ultima">
@@ -174,11 +191,15 @@ export function TodayPage() {
               </Link>
             </div>
             {prs.length ? (
-              <ul className="list">
-                {prs.map((p, i) => (
-                  <PRRow key={i} pr={p} date={p.date} name={ex.get(p.exerciseId)?.name ?? ''} />
-                ))}
-              </ul>
+              <ShowMore items={prs} limit={3} noun="récords">
+                {(visible) => (
+                  <ul className="list">
+                    {visible.map((p, i) => (
+                      <PRRow key={i} pr={p} date={p.date} name={ex.get(p.exerciseId)?.name ?? ''} />
+                    ))}
+                  </ul>
+                )}
+              </ShowMore>
             ) : (
               <p className="muted">Los récords aparecen cuando superas una marca anterior en un ejercicio.</p>
             )}
@@ -238,6 +259,7 @@ export function PRRow({ pr, name, date }: { pr: PRHit; name: string; date?: numb
       : pr.kind === 'volumen'
         ? `${fmtVolume(pr.value, unit)} ${unit}`
         : `${fmtWeight(pr.value, unit)} ${unit}`;
+  const advanced = showsAdvancedMetrics(useSettings());
   return (
     <li className="pr-row">
       <span className="stack" style={{ '--gap': '2px' } as React.CSSProperties}>
@@ -245,7 +267,7 @@ export function PRRow({ pr, name, date }: { pr: PRHit; name: string; date?: numb
           {name}
         </span>
         <span className="eyebrow">
-          {PR_LABEL[pr.kind]}
+          {prLabel(pr.kind, advanced)}
           {date ? ` · ${fmtDateShort(date)}` : ''}
         </span>
       </span>

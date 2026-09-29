@@ -207,7 +207,14 @@ export interface Settings {
   exportReminderSnoozedUntil?: number;
   /** Ya se mostró la guía de instalación en iOS. */
   installHintSeen?: boolean;
+  /** Modo avanzado: anotar RIR/RPE por serie. Sin valor = sí. */
+  effortTracking?: boolean;
 }
+
+/** RIR y RPE solo se piden en modo avanzado y si el usuario no los apagó. */
+export const showsEffort = (s: Pick<Settings, 'mode' | 'effortTracking'>) => s.mode === 'avanzado' && s.effortTracking !== false;
+/** 1RM estimado y demás métricas técnicas: solo en modo avanzado. */
+export const showsAdvancedMetrics = (s: Pick<Settings, 'mode'>) => s.mode === 'avanzado';
 
 export const DEFAULT_SETTINGS: Settings = {
   id: 'app',

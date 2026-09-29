@@ -1,0 +1,45 @@
+<!-- Pega esto dentro de <head> en index.html de la app (reemplaza lo equivalente).
+     Copia a public/: favicon.ico, favicon.svg, favicon-32.png, favicon-16.png, apple-touch-icon.png,
+     og-es.png (renómbrala a og.png si prefieres), og-en.png, icons/*, screenshots/*.
+     %SITE_URL% lo reemplaza vite.config.ts con VITE_SITE_URL. -->
+<link rel="icon" href="/favicon.ico" sizes="48x48" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+<link rel="icon" href="/favicon-16.png" type="image/png" sizes="16x16" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="canonical" href="%SITE_URL%/" />
+<meta name="keywords" content="rutina gimnasio, registro de entrenamiento, gym tracker, series y repeticiones, 1RM, split, PPL, torso pierna" />
+
+<meta property="og:type" content="website" />
+<meta property="og:url" content="%SITE_URL%/" />
+<meta property="og:locale" content="es_MX" />
+<meta property="og:locale:alternate" content="en_US" />
+<meta property="og:site_name" content="SERIE" />
+<meta property="og:title" content="SERIE — Cada serie, anotada." />
+<meta property="og:description" content="Registro de rutinas de gimnasio. Gratis, sin cuentas: tus datos se quedan en tu dispositivo." />
+<meta property="og:image" content="%SITE_URL%/og-es.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="SERIE: Cada serie, anotada." />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="SERIE — Cada serie, anotada." />
+<meta name="twitter:description" content="Registro de rutinas de gimnasio. Gratis y sin cuentas." />
+<meta name="twitter:image" content="%SITE_URL%/og-es.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "SERIE",
+  "url": "%SITE_URL%/",
+  "description": "Registro de rutinas de gimnasio: series, peso, reps, descansos, récords y progreso. Sin cuentas; los datos se guardan en el dispositivo.",
+  "applicationCategory": "HealthApplication",
+  "applicationSubCategory": "Fitness",
+  "operatingSystem": "Web, iOS, Android",
+  "inLanguage": "es-MX",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "MXN" },
+  "image": "%SITE_URL%/og-es.png",
+  "screenshot": "%SITE_URL%/screenshots/movil-2-sesion.png"
+}
+</script>

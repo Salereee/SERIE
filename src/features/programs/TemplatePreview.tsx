@@ -3,6 +3,7 @@ import { useExerciseMap } from '../../db/hooks';
 import type { ProgramDay, Questionnaire } from '../../db/schema';
 import { TEMPLATE_BY_KEY, buildDays, type TemplateKey } from '../../db/seed/programs';
 import { fmtClock } from '../../domain/format';
+import { ShowMore } from '../../ui/ShowMore';
 import './programs.css';
 
 /** Vista previa de un programa (plantilla o días ya construidos). */
@@ -11,7 +12,13 @@ export function TemplatePreview({ templateKey, q, compact }: { templateKey: Temp
     () => buildDays(TEMPLATE_BY_KEY[templateKey], { equipment: q.equipment, goal: q.goal, experience: q.experience }),
     [templateKey, q],
   );
-  return <DaysTable days={days} compact={compact} />;
+  // En la recomendación basta ver el primer día; el resto queda a un toque.
+  if (compact) return <DaysTable days={days} compact />;
+  return (
+    <ShowMore items={days} limit={1} noun="días">
+      {(visible) => <DaysTable days={visible} />}
+    </ShowMore>
+  );
 }
 
 export function DaysTable({ days, compact, wide }: { days: ProgramDay[]; compact?: boolean; wide?: boolean }) {

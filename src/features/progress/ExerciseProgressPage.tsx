@@ -3,13 +3,14 @@ import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { db } from '../../db/db';
 import { useExerciseLogs, useSettings } from '../../db/hooks';
-import { EQUIPMENT_LABEL, MUSCLE_LABEL } from '../../db/schema';
+import { EQUIPMENT_LABEL, MUSCLE_LABEL, showsAdvancedMetrics } from '../../db/schema';
 import { fmtDateFull, fmtDateShort } from '../../domain/format';
 import { suggest } from '../../domain/progression';
 import { computeRecords } from '../../domain/records';
 import { fmtVolume, fmtWeight, toDisplay } from '../../domain/units';
 import { Icon } from '../../ui/Icon';
 import { Meta } from '../../ui/Meta';
+import { ShowMore } from '../../ui/ShowMore';
 import { LineChart, type Point } from './charts';
 import './progress.css';
 
@@ -21,7 +22,10 @@ export function ExerciseProgressPage() {
   const logsDesc = useExerciseLogs(exerciseId);
   const settings = useSettings();
   const unit = settings.unit;
-  const [metric, setMetric] = useState<Metric>('1rm');
+  const advanced = showsAdvancedMetrics(settings);
+  const [chosen, setMetric] = useState<Metric>('1rm');
+  // El 1RM estimado es una métrica técnica: el modo básico grafica el peso máximo.
+  const metric: Metric = advanced ? chosen : 'peso';
 
   const logs = useMemo(() => [...(logsDesc ?? [])].reverse(), [logsDesc]);
   const rec = useMemo(() => computeRecords(logs), [logs]);
@@ -84,11 +88,11 @@ export function ExerciseProgressPage() {
       {logs.length === 0 ? (
         <div className="empty">
           <span className="empty__title">Aún no hay registros de este ejercicio</span>
-          <p>Agrégalo a una sesión; después de la primera verás su 1RM estimado, peso máximo y récords.</p>
+          <p>Agrégalo a una sesión; después de la primera verás su peso máximo, récords y evolución.</p>
         </div>
       ) : (
         <>
-          <div className="stat-row prog__stats" style={{ '--cols': 4 } as React.CSSProperties}>
+          <div className="stat-row prog__stats" style={{ '--cols': advanced ? 4 : 3 } as React.CSSProperties}>
             <div className="stat">
               <span className="eyebrow">Peso máximo</span>
               <span className="num-lg">
@@ -97,14 +101,16 @@ export function ExerciseProgressPage() {
               </span>
               {rec.bestWeightDate && <span className="small muted">{fmtDateShort(rec.bestWeightDate)}</span>}
             </div>
-            <div className="stat">
-              <span className="eyebrow">1RM estimado</span>
-              <span className="num-lg">
-                {fmtWeight(rec.best1RM, unit)}
-                <span className="unit">{unit}</span>
-              </span>
-              {rec.best1RMDate && <span className="small muted">{fmtDateShort(rec.best1RMDate)}</span>}
-            </div>
+            {advanced && (
+              <div className="stat">
+                <span className="eyebrow">1RM estimado</span>
+                <span className="num-lg">
+                  {fmtWeight(rec.best1RM, unit)}
+                  <span className="unit">{unit}</span>
+                </span>
+                {rec.best1RMDate && <span className="small muted">{fmtDateShort(rec.best1RMDate)}</span>}
+              </div>
+            )}
             <div className="stat">
               <span className="eyebrow">Mejor volumen</span>
               <span className="num-lg">
@@ -121,6 +127,7 @@ export function ExerciseProgressPage() {
 
           <div className="grid12" style={{ rowGap: 32 }}>
             <section className="span-8 stack" aria-label="Gráfica">
+{advanced ? (
               <div className="tabs-line" role="tablist" aria-label="Métrica">
                 <button role="tab" aria-selected={metric === '1rm'} onClick={() => setMetric('1rm')}>
                   1RM estimado
@@ -129,6 +136,9 @@ export function ExerciseProgressPage() {
                   Peso máximo
                 </button>
               </div>
+              ) : (
+                <h2 className="eyebrow eyebrow--ink">Peso máximo por sesión</h2>
+              )}
               {points.length > 1 ? (
                 <LineChart points={points} format={(v) => `${nf(v)}`} title={`${metric === '1rm' ? '1RM estimado' : 'Peso máximo'} de ${exercise.name} en ${unit}`} />
               ) : (
@@ -154,6 +164,8 @@ export function ExerciseProgressPage() {
                 <div className="section-head">
                   <h2 className="eyebrow eyebrow--ink">Más reps por peso</h2>
                 </div>
+                <ShowMore items={repRecords} limit={5} noun="pesos">
+                  {(visible) => (
                 <table className="reps-table">
                   <thead>
                     <tr>
@@ -164,7 +176,7 @@ export function ExerciseProgressPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {repRecords.map(([w, r]) => (
+                    {visible.map(([w, r]) => (
                       <tr key={w}>
                         <td className="mono">
                           {fmtWeight(w, unit)} {unit}
@@ -174,6 +186,8 @@ export function ExerciseProgressPage() {
                     ))}
                   </tbody>
                 </table>
+                  )}
+                </ShowMore>
               </section>
             </aside>
 
@@ -184,8 +198,10 @@ export function ExerciseProgressPage() {
                 </h2>
                 <span className="eyebrow mono">{logs.length}</span>
               </div>
+              <ShowMore items={logsDesc} limit={5} noun="sesiones">
+                {(visible) => (
               <ol>
-                {logsDesc.map((l) => (
+                {visible.map((l) => (
                   <li key={l.id} className="xh">
                     <Link to={`/historial/${l.sessionId}`} className="eyebrow eyebrow--ink" title={fmtDateFull(l.date)}>
                       {fmtDateShort(l.date)}
@@ -197,10 +213,12 @@ export function ExerciseProgressPage() {
                         </span>
                       ))}
                     </span>
-                    <span className="mono small muted">{fmtWeight(l.best1RM, unit)}</span>
+                    {advanced && <span className="mono small muted">{fmtWeight(l.best1RM, unit)}</span>}
                   </li>
                 ))}
               </ol>
+                )}
+              </ShowMore>
             </section>
           </div>
         </>

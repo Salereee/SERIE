@@ -1,25 +1,31 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { db } from '../../db/db';
 import { useExerciseMap, useSettings } from '../../db/hooks';
-import { MUSCLE_LABEL, type ExerciseLog, type Muscle, type Session } from '../../db/schema';
+import { MUSCLE_LABEL, showsAdvancedMetrics, type ExerciseLog, type Muscle, type Session } from '../../db/schema';
 import { fmtDateShort, fmtRelativeDay, startOfWeek } from '../../domain/format';
 import { fmtVolume, fmtWeight } from '../../domain/units';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { Icon } from '../../ui/Icon';
+import { ShowMore } from '../../ui/ShowMore';
+import { ExercisePicker } from '../library/ExercisePicker';
 import { BarList, Spark, WeekHeatmap } from './charts';
 import './progress.css';
 
 const WEEK = 7 * 86400000;
 
 export function ProgressPage() {
-  const { unit } = useSettings();
+  const settings = useSettings();
+  const { unit } = settings;
+  const advanced = showsAdvancedMetrics(settings);
   const ex = useExerciseMap();
   const desktop = useMediaQuery('(min-width: 900px)');
   const sessions = useLiveQuery(() => db.sessions.where('status').equals('terminada').toArray(), [], undefined as Session[] | undefined);
   const logs = useLiveQuery(() => db.logs.toArray(), [], [] as ExerciseLog[]);
   const [weekOffset, setWeekOffset] = useState(0);
+  const [picking, setPicking] = useState(false);
+  const navigate = useNavigate();
 
   const now = Date.now();
   const thisWeek = startOfWeek(now);
@@ -62,10 +68,10 @@ export function ProgressPage() {
     const m = new Map<string, { n: number; best: number; last: number }>();
     for (const l of logs) {
       const c = m.get(l.exerciseId) ?? { n: 0, best: 0, last: 0 };
-      m.set(l.exerciseId, { n: c.n + 1, best: Math.max(c.best, l.best1RM), last: Math.max(c.last, l.date) });
+      m.set(l.exerciseId, { n: c.n + 1, best: Math.max(c.best, advanced ? l.best1RM : l.topWeightKg), last: Math.max(c.last, l.date) });
     }
     return [...m.entries()].sort((a, b) => b[1].last - a[1].last);
-  }, [logs]);
+  }, [logs, advanced]);
 
   if (!sessions) return null;
 
@@ -176,10 +182,14 @@ export function ProgressPage() {
             <h2 id="ejs" className="eyebrow eyebrow--ink">
               Por ejercicio
             </h2>
-            <span className="eyebrow mono">{byExercise.length}</span>
+            <button className="link-btn small" onClick={() => setPicking(true)}>
+              Buscar ejercicio
+            </button>
           </div>
+          <ShowMore items={byExercise} limit={5} noun="ejercicios">
+            {(visible) => (
           <ul className="list">
-            {byExercise.map(([id, v]) => (
+            {visible.map(([id, v]) => (
               <li key={id}>
                 <Link className="row-link" to={`/progreso/${id}`}>
                   <span className="stack" style={{ '--gap': '2px' } as React.CSSProperties}>
@@ -190,13 +200,15 @@ export function ProgressPage() {
                       {v.n} sesiones · {fmtRelativeDay(v.last)}
                     </span>
                   </span>
-                  <span className="mono" title="1RM estimado">
+                  <span className="mono" title={advanced ? '1RM estimado' : 'Peso máximo'}>
                     {v.best > 0 ? `${fmtWeight(v.best, unit)} ${unit}` : '—'}
                   </span>
                 </Link>
               </li>
             ))}
           </ul>
+            )}
+          </ShowMore>
         </section>
 
         <section className="span-6" aria-labelledby="tend">
@@ -205,6 +217,8 @@ export function ProgressPage() {
               Series por semana · 8 semanas
             </h2>
           </div>
+          <ShowMore items={muscleWeeks} limit={6} noun="grupos">
+            {(visible) => (
           <table className="trend">
             <thead>
               <tr>
@@ -219,7 +233,7 @@ export function ProgressPage() {
               </tr>
             </thead>
             <tbody>
-              {muscleWeeks.map(([muscle, v]) => (
+              {visible.map(([muscle, v]) => (
                 <tr key={muscle}>
                   <th scope="row">{MUSCLE_LABEL[muscle]}</th>
                   <td>
@@ -231,8 +245,19 @@ export function ProgressPage() {
               ))}
             </tbody>
           </table>
+            )}
+          </ShowMore>
         </section>
       </div>
+
+      {picking && (
+        <ExercisePicker
+          title="Ver progreso de…"
+          onlyIds={byExercise.map(([id]) => id)}
+          onClose={() => setPicking(false)}
+          onPick={(e) => navigate(`/progreso/${e.id}`)}
+        />
+      )}
     </div>
   );
 }
