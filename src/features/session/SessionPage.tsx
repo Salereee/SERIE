@@ -35,16 +35,22 @@ import {
   replaceExercise,
   setFocus,
   setNotes,
+  snapshotBeforeComplete,
   supersetMembers,
   uncompleteSet,
+  undoComplete,
   updateSet,
 } from './actions';
+import { barKgFor, platesPerSide } from '../../domain/plates';
+import { toDisplay } from '../../domain/units';
+import { MAX_NOTE } from '../../db/validate';
 import { RestTimer } from './RestTimer';
 import { SetRow } from './SetRow';
 import { accordionState } from './accordion';
 import { useSessionLock } from './useSessionLock';
 import './session.css';
 import './session-accordion.css';
+import { Help } from '../../ui/Help';
 
 export function SessionPage() {
   const session = useActiveSession();
@@ -164,21 +170,33 @@ function ActiveSession({ session }: { session: Session }) {
     }
     sfx('set');
     haptic(12);
+    const snap = snapshotBeforeComplete(session, exIdx);
+    const undo = () => {
+      sfx('unset');
+      void undoComplete(session.id, snap);
+    };
+    const name = exMap.get(ex.exerciseId)?.name ?? '';
+    let pr = false;
     if (!set.isWarmup && set.weightKg != null && set.reps) {
       const rec = history.recs.get(ex.exerciseId);
       if (rec) {
         const kinds = setPRs(rec, doneWorkSetsBefore(session, ex.exerciseId), { w: set.weightKg, r: set.reps });
         if (kinds.length) {
-          const name = exMap.get(ex.exerciseId)?.name ?? '';
+          pr = true;
           setTimeout(() => {
             sfx('pr');
             haptic([30, 60, 30]);
           }, 140);
-          toast({ tone: 'pr', message: `Récord · ${kinds.map((k) => prLabel(k, showsAdvancedMetrics(settings))).join(' + ')} · ${name}`, durationMs: 4500 });
+          toast({ tone: 'pr', message: `Récord · ${kinds.map((k) => prLabel(k, showsAdvancedMetrics(settings))).join(' + ')} · ${name}`, durationMs: 4500, onAction: undo });
         }
       }
     }
     await completeSet(session.id, exIdx, setIdx, settings.defaultRestSec);
+    // Un toque en ✓ arranca el descanso y puede cambiar de ejercicio: se puede deshacer unos segundos.
+    if (!pr) {
+      const n = ex.sets.slice(0, setIdx + 1).filter((x) => x.isWarmup === set.isWarmup).length;
+      toast({ message: set.isWarmup ? `Calentamiento ${n} registrado` : `Serie ${n} registrada · ${name}`, durationMs: 3500, onAction: undo });
+    }
   };
 
   const onFinish = async (save: boolean) => {
@@ -551,6 +569,13 @@ function ExercisePanel({ session, index, ex, exercise, logs, records, settings, 
   let work = 0;
   let warm = 0;
   const labels = ex.sets.map((s) => (s.isWarmup ? `C${++warm}` : String(++work)));
+  const [editingNote, setEditingNote] = useState(false);
+  const plateSetIdx = firstPending !== -1 ? firstPending : ex.sets.length - 1;
+  const plateSet = ex.sets[plateSetIdx];
+  const plates =
+    exercise?.equipment === 'barra' && plateSet?.weightKg != null
+      ? { weightKg: plateSet.weightKg, barKg: barKgFor(settings.barKg, unit), label: `${plateSet.isWarmup ? 'calentamiento' : 'serie'} ${labels[plateSetIdx]}` }
+      : null;
 
   return (
     <div className="panel">
@@ -574,6 +599,12 @@ function ExercisePanel({ session, index, ex, exercise, logs, records, settings, 
       <p className="panel__target mono">
         {ex.targetSets ? `${ex.targetSets} × ${ex.repMin}–${ex.repMax}` : 'Sin objetivo'} · descanso {fmtClock(ex.restSec)}
       </p>
+      {exercise?.note && (
+        <button className="exnote" onClick={() => setEditingNote(true)} aria-label={`Nota de ${exercise.name}: ${exercise.note}. Toca para editar`}>
+          <Icon name="edit" size={16} />
+          <span>{exercise.note}</span>
+        </button>
+      )}
 
       <div className="panel__last">
         <span className="eyebrow">{last ? `Última vez · ${fmtRelativeDay(last.date)}` : 'Primera vez'}</span>
@@ -593,7 +624,7 @@ function ExercisePanel({ session, index, ex, exercise, logs, records, settings, 
       {sug && pendingWork.length > 0 && (
         <div className="sug" data-kind={sug.kind}>
           <div className="sug__text">
-            <span className="eyebrow eyebrow--ink">Sugerencia · {KIND_LABEL[sug.kind]}</span>
+            <span className="eyebrow eyebrow--ink">Sugerencia · {KIND_LABEL[sug.kind]} <Help term="sugerencia" /></span>
             <span className="small">{sug.reason}</span>
           </div>
           <button
@@ -639,6 +670,8 @@ function ExercisePanel({ session, index, ex, exercise, logs, records, settings, 
         </ol>
       </div>
 
+      {plates && <PlatesLine {...plates} unit={unit} />}
+
       <div className="panel__tools">
         <button className="btn btn--sm" onClick={() => onAddSet(false)}>
           <Icon name="plus" size={16} /> Serie
@@ -646,8 +679,80 @@ function ExercisePanel({ session, index, ex, exercise, logs, records, settings, 
         <button className="btn btn--sm btn--ghost" onClick={() => onAddSet(true)}>
           <Icon name="plus" size={16} /> Calentamiento
         </button>
+        <Help term="calentamiento" />
+        {exercise && !exercise.note && (
+          <button className="btn btn--sm btn--ghost" onClick={() => setEditingNote(true)}>
+            <Icon name="edit" size={16} /> Nota
+          </button>
+        )}
       </div>
+      {editingNote && exercise && <ExerciseNoteSheet exercise={exercise} onClose={() => setEditingNote(false)} />}
     </div>
+  );
+}
+
+/** Discos por lado para la serie que sigue (solo ejercicios con barra). */
+function PlatesLine({ weightKg, barKg, label, unit }: { weightKg: number; barKg: number; label: string; unit: Settings['unit'] }) {
+  const r = platesPerSide(weightKg, barKg, unit);
+  const n = (v: number) => v.toLocaleString('es-MX', { maximumFractionDigits: 2 });
+  return (
+    <p className="plates" aria-live="polite">
+      <span className="eyebrow">Discos por lado · {label}</span>
+      <span className="plates__row mono">
+        {r.belowBar
+          ? `Menos que la barra (${n(toDisplay(barKg, unit))} ${unit})`
+          : r.perSide.length === 0
+            ? 'Solo la barra'
+            : r.perSide.map((p, i) => (
+                <span key={i} className="plate" data-size={p >= (unit === 'kg' ? 20 : 45) ? 'l' : p >= (unit === 'kg' ? 10 : 25) ? 'm' : 's'}>
+                  {n(p)}
+                </span>
+              ))}
+        {!r.belowBar && r.remainder > 0 && <span className="muted"> + {n(r.remainder)} {unit} que no salen con discos</span>}
+      </span>
+    </p>
+  );
+}
+
+function ExerciseNoteSheet({ exercise, onClose }: { exercise: Exercise; onClose: () => void }) {
+  const [text, setText] = useState(exercise.note ?? '');
+  const save = async (note: string) => {
+    await db.exercises.update(exercise.id, { note: note.trim() || undefined });
+    onClose();
+  };
+  return (
+    <Sheet
+      title={exercise.name}
+      eyebrow="Nota del ejercicio"
+      onClose={onClose}
+      footer={
+        <div className="cluster">
+          <button className="btn btn--primary" onClick={() => save(text)}>
+            Guardar
+          </button>
+          {exercise.note && (
+            <button className="btn btn--ghost" onClick={() => save('')}>
+              Quitar nota
+            </button>
+          )}
+        </div>
+      }
+    >
+      <label className="field">
+        <span className="field__label">Se muestra cada vez que hagas este ejercicio</span>
+        <textarea
+          className="textarea"
+          value={text}
+          maxLength={MAX_NOTE}
+          placeholder="Asiento en 4, agarre cerrado, pausa abajo…"
+          onChange={(e) => setText(e.target.value)}
+          autoFocus
+        />
+        <span className="field__hint">
+          {text.length}/{MAX_NOTE}
+        </span>
+      </label>
+    </Sheet>
   );
 }
 

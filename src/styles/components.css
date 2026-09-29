@@ -1012,3 +1012,58 @@ body:has(.rest) .toasts {
   min-height: 52px;
   padding: 0 4px;
 }
+
+/* Nota fija del ejercicio: se lee de un vistazo, un toque la edita. */
+.exnote {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: start;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--accent);
+  background: var(--fill);
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+  color: var(--ink);
+}
+.exnote svg {
+  margin-top: 2px;
+  color: var(--muted);
+}
+
+/* "?" del modo básico: círculo chico, área táctil de 44 px. */
+.help {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin: -12px -8px -12px 2px;
+  padding: 12px;
+  box-sizing: content-box;
+  vertical-align: middle;
+  background-clip: content-box;
+  color: var(--muted);
+  font: 700 12px/1 var(--font-mono);
+  transition: color var(--t-press) ease;
+}
+.help span {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+}
+.help:hover,
+.help:focus-visible {
+  color: var(--ink);
+}
+.help__text {
+  max-width: 52ch;
+  line-height: 1.55;
+  font-size: 16px;
+}

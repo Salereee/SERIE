@@ -111,3 +111,16 @@ Marca cada casilla al terminar. Si algo no coincide con el resultado esperado, a
   **Esperado:** abre `/inicio/`.
 - [ ] **I8. Compartir.** Pega `https://<tu-sitio>/inicio/` en WhatsApp.
   **Esperado:** puede salir sin imagen mientras `og:image` de `public/inicio/index.html` sea relativa (`/og.png`); con URL absoluta, sale la imagen negra “Cada serie, anotada.”
+
+## J. Novedades 1.0.2
+
+- [ ] **J1. Deshacer.** En una sesión, toca ✓ en una serie y luego “Deshacer” en el aviso.
+  **Esperado:** la serie vuelve a pendiente, el descanso desaparece (o vuelve al anterior) y el acordeón regresa al mismo ejercicio.
+- [ ] **J2. Discos por lado.** En un ejercicio con barra, escribe 102.5 kg en la serie que sigue.
+  **Esperado:** “Discos por lado” muestra 25 · 15 · 1.25. Con la unidad en lb y 225 lb: 45 · 45.
+- [ ] **J3. Barra.** Ajustes → Entrenamiento → Peso de la barra → 15 kg.
+  **Esperado:** los discos se recalculan; con “Sin barra” se reparte todo el peso.
+- [ ] **J4. Nota del ejercicio.** En la sesión, toca “Nota”, escribe algo y guarda. Termina la sesión y empieza otra con ese ejercicio.
+  **Esperado:** la nota aparece arriba del ejercicio; también en la ficha de la Biblioteca. Exporta e importa un respaldo: la nota sigue ahí.
+- [ ] **J5. Ayudas del modo básico.** En modo básico toca los “?” (Sugerencia, Volumen, Récords, Calentamiento).
+  **Esperado:** una hoja con la explicación. En modo avanzado los “?” no aparecen.

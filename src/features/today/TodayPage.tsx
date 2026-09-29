@@ -21,6 +21,7 @@ import { Disclosure, useOpenSections } from '../../ui/Disclosure';
 
 const closedByDefault = () => false;
 import './today.css';
+import { Help } from '../../ui/Help';
 
 export function TodayPage() {
   const settings = useSettings();
@@ -184,7 +185,7 @@ export function TodayPage() {
           <section aria-labelledby="prs">
             <div className="section-head">
               <h2 id="prs" className="eyebrow eyebrow--ink">
-                Récords recientes
+                Récords recientes <Help term="records" />
               </h2>
               <Link to="/progreso" className="link-btn small">
                 Progreso

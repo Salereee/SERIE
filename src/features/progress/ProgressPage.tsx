@@ -12,6 +12,7 @@ import { ShowMore } from '../../ui/ShowMore';
 import { ExercisePicker } from '../library/ExercisePicker';
 import { BarList, Spark, WeekHeatmap } from './charts';
 import './progress.css';
+import { Help } from '../../ui/Help';
 
 const WEEK = 7 * 86400000;
 
@@ -129,7 +130,7 @@ export function ProgressPage() {
           <span className="small muted">semanas seguidas</span>
         </div>
         <div className="stat">
-          <span className="eyebrow">Volumen 7 días</span>
+          <span className="eyebrow">Volumen 7 días <Help term="volumen" /></span>
           <span className="num-lg">
             {fmtVolume(stats.vol7, unit)}
             <span className="unit">{unit}</span>

@@ -29,12 +29,15 @@ jobs:
       - run: npm test
       - run: npm run check:contrast
       - name: Build
-        run: npx tsc -b && npx vite build
+        run: |
+          # El dominio de GitHub Pages va en minúsculas; la subruta respeta el nombre del repo.
+          export VITE_SITE_URL="https://${OWNER,,}.github.io/${BASE_PATH}"
+          npx tsc -b && npx vite build
         env:
+          OWNER: ${{ github.repository_owner }}
           # Subruta del sitio de proyecto (el nombre del repositorio).
           BASE_PATH: ${{ github.event.repository.name }}
           GITHUB_PAGES: 'true'
-          VITE_SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
           # Decisiones pendientes (ver README): sin indexación, sin analítica y sin source maps.
           ALLOW_INDEXING: ''
           SOURCEMAP: ''

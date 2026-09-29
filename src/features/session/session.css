@@ -583,3 +583,38 @@
 .sug {
   animation: enter-rise var(--t-base) var(--ease) 80ms both;
 }
+
+/* Discos por lado: tamaños de disco como bloques, más altos los más pesados. */
+.plates {
+  display: grid;
+  gap: 6px;
+  padding: 10px 0 2px;
+}
+.plates__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+}
+.plate {
+  display: inline-grid;
+  place-items: center;
+  min-width: 34px;
+  padding: 0 6px;
+  border: var(--b2);
+  font-weight: 500;
+}
+.plate[data-size='l'] {
+  height: 34px;
+  background: var(--ink);
+  color: var(--bg);
+}
+.plate[data-size='m'] {
+  height: 28px;
+}
+.plate[data-size='s'] {
+  height: 22px;
+  min-width: 28px;
+  font-size: 11px;
+}

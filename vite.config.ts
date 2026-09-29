@@ -187,7 +187,7 @@ export default defineConfig(({ mode }) => {
           screenshots: [
             { src: 'screenshots/movil-1-hoy.png', sizes: '1080x2337', type: 'image/png', form_factor: 'narrow', label: 'Hoy: tu día de entrenamiento' },
             { src: 'screenshots/movil-2-sesion.png', sizes: '1080x2337', type: 'image/png', form_factor: 'narrow', label: 'Sesión activa con timer de descanso' },
-            { src: 'screenshots/movil-3-progreso.png', sizes: '1080x2337', type: 'image/png', form_factor: 'narrow', label: 'Progreso por ejercicio y 1RM' },
+            { src: 'screenshots/movil-3-progreso.png', sizes: '1080x2337', type: 'image/png', form_factor: 'narrow', label: 'Progreso por ejercicio' },
             { src: 'screenshots/movil-4-historial.png', sizes: '1080x2337', type: 'image/png', form_factor: 'narrow', label: 'Historial de sesiones' },
             { src: 'screenshots/escritorio-1-hoy.png', sizes: '1920x1200', type: 'image/png', form_factor: 'wide', label: 'SERIE en computadora' },
             { src: 'screenshots/escritorio-2-sesion.png', sizes: '1920x1200', type: 'image/png', form_factor: 'wide', label: 'Sesión en computadora' },

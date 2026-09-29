@@ -23,7 +23,7 @@ export async function exportBackup(): Promise<Blob> {
     version: BACKUP_FORMAT_VERSION,
     exportedAt: new Date().toISOString(),
     // Solo se exportan los ejercicios propios y los predefinidos archivados; el resto viene con la app.
-    exercises: await db.exercises.filter((e) => e.isCustom || !!e.archived).toArray(),
+    exercises: await db.exercises.filter((e) => e.isCustom || !!e.archived || !!e.note).toArray(),
     programs: await db.programs.toArray(),
     sessions: await db.sessions.toArray(),
     settings,
@@ -107,6 +107,12 @@ export async function importBackup(b: ValidBackup, mode: ImportMode): Promise<Im
     const exIds = await has(db.exercises, exercises.map((e) => e.id));
     const newEx = exercises.filter((e) => e.isCustom && !exIds.has(e.id));
     await db.exercises.bulkAdd(newEx);
+    // Notas de ejercicios que ya existen: solo se agregan donde no tienes una.
+    for (const e of exercises) {
+      if (!e.note || !exIds.has(e.id)) continue;
+      const local = await db.exercises.get(e.id);
+      if (local && !local.note) await db.exercises.update(e.id, { note: e.note });
+    }
 
     const progIds = await has(db.programs, b.programs.map((p) => p.id));
     const newProgs = b.programs.filter((p) => !progIds.has(p.id));

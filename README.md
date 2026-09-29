@@ -88,11 +88,38 @@ Abre la URL `Local` que imprime Vite (por defecto <http://localhost:5173>).
 | `npm test` | Pruebas de lógica: 1RM, progresión, deload, récords, recomendación, migraciones, sesión, respaldo (incluidos archivos malformados), unidades, medianoche |
 | `npm run check:contrast` | Verifica contraste WCAG AA de todas las combinaciones de color, en ambos temas |
 | `npm run build` | Revisa tipos y genera `dist/` (incluye service worker, manifest, `_headers`, `_redirects`, `robots.txt` y, si aplica, `sitemap.xml`) |
-| `npm run build:ci` | `test` + `check:contrast` + `build`. **Es el que usa Cloudflare**: si un test falla, no se publica |
+| `npm run build:ci` | `test` + `check:contrast` + `build`. Lo mismo que corre el workflow de GitHub Pages antes de publicar |
 | `npm run preview` | Sirve `dist/` en <http://localhost:4173> (con `--host` para probar en el celular) |
 | `npm run icons` | Regenera íconos PWA, `apple-touch-icon`, `favicon.svg` e imagen Open Graph (`og.png`) desde la identidad visual. No genera `favicon.ico`, `favicon-*.png`, `og-en.png` ni las capturas: esos vienen del kit de lanzamiento y se versionan tal cual |
 
-## Despliegue en Cloudflare Pages
+## Despliegue en GitHub Pages (sitio oficial)
+
+Publicada en **<https://salereee.github.io/SERIE/>**. La página de presentación del proyecto está en **<https://salereee.github.io/SERIE/inicio/>**.
+
+El workflow [`.github/workflows/pages.yml`](.github/workflows/pages.yml) corre tests y contraste, compila y publica en cada push a `main` (o a mano desde **Actions → GitHub Pages → Run workflow**). En el repo, **Settings → Pages → Source** debe ser **GitHub Actions**.
+
+GitHub Pages sirve el sitio en una subruta (`/<repo>/`) y no tiene cabeceras propias ni modo SPA, así que el build usa dos variables más:
+
+| Variable | Efecto |
+| --- | --- |
+| `BASE_PATH` | Subruta de la app (el workflow usa el nombre del repo). Ajusta rutas de assets, router, manifest (`start_url`, `scope`, accesos directos) y el service worker. Vacía = raíz, como en Cloudflare |
+| `GITHUB_PAGES=true` | Pone la CSP en una etiqueta `<meta>`, copia `index.html` a `404.html` (así funcionan los enlaces directos como `/SERIE/progreso`), agrega `.nojekyll` y quita `_headers`/`_redirects` |
+
+La subruta distingue mayúsculas y sale del nombre del repo: si lo renombras, la URL cambia y hay que volver a desplegar (**Actions → GitHub Pages → Run workflow**). Los datos de quien usaba la URL anterior se quedan en esa URL.
+
+Para probarlo en local:
+
+```bash
+BASE_PATH=serie GITHUB_PAGES=true npx vite build && BASE_PATH=serie npx vite preview
+```
+
+y abre <http://localhost:4173/serie/>.
+
+**Diferencias con Cloudflare Pages:** en GitHub Pages no se pueden enviar cabeceras. Se conserva la CSP (en `<meta>`), pero no aplican `frame-ancestors`/`X-Frame-Options` (el sitio se puede incrustar en un iframe), `Permissions-Policy`, `Cross-Origin-Opener-Policy` ni el control de cache de `sw.js` (GitHub usa 10 minutos, así que una versión nueva puede tardar ese tiempo en detectarse). Los enlaces directos responden con estado 404 aunque la app se abre bien. Los datos de los usuarios son por dominio: los de `salereee.github.io` no se ven en otro dominio (exportar/importar para moverlos).
+
+## Despliegue alternativo: Cloudflare Pages
+
+SERIE vive en GitHub Pages. Esta opción queda documentada por si algún día se usa un dominio propio o Cloudflare; hoy no hay un proyecto activo ahí.
 
 ### Opción A: conectar el repositorio de GitHub (recomendada)
 
@@ -128,34 +155,9 @@ La primera vez, Wrangler abre el navegador para iniciar sesión en Cloudflare y 
 - **Desde git:** `git revert <commit>` y push; Cloudflare publica la versión corregida.
 - Los usuarios con la app abierta verán “Hay una versión nueva · Actualizar” (nunca durante una sesión activa). Sus datos no se tocan: viven en su dispositivo.
 
-## Despliegue en GitHub Pages
-
-Publicada en **<https://salereee.github.io/SERIE/>**. La página de presentación del proyecto está en **<https://salereee.github.io/SERIE/inicio/>**.
-
-El workflow [`.github/workflows/pages.yml`](.github/workflows/pages.yml) corre tests y contraste, compila y publica en cada push a `main` (o a mano desde **Actions → GitHub Pages → Run workflow**). En el repo, **Settings → Pages → Source** debe ser **GitHub Actions**.
-
-GitHub Pages sirve el sitio en una subruta (`/<repo>/`) y no tiene cabeceras propias ni modo SPA, así que el build usa dos variables más:
-
-| Variable | Efecto |
-| --- | --- |
-| `BASE_PATH` | Subruta de la app (el workflow usa el nombre del repo). Ajusta rutas de assets, router, manifest (`start_url`, `scope`, accesos directos) y el service worker. Vacía = raíz, como en Cloudflare |
-| `GITHUB_PAGES=true` | Pone la CSP en una etiqueta `<meta>`, copia `index.html` a `404.html` (así funcionan los enlaces directos como `/SERIE/progreso`), agrega `.nojekyll` y quita `_headers`/`_redirects` |
-
-La subruta distingue mayúsculas y sale del nombre del repo: si lo renombras, la URL cambia y hay que volver a desplegar (**Actions → GitHub Pages → Run workflow**). Los datos de quien usaba la URL anterior se quedan en esa URL.
-
-Para probarlo en local:
-
-```bash
-BASE_PATH=serie GITHUB_PAGES=true npx vite build && BASE_PATH=serie npx vite preview
-```
-
-y abre <http://localhost:4173/serie/>.
-
-**Diferencias con Cloudflare Pages:** en GitHub Pages no se pueden enviar cabeceras. Se conserva la CSP (en `<meta>`), pero no aplican `frame-ancestors`/`X-Frame-Options` (el sitio se puede incrustar en un iframe), `Permissions-Policy`, `Cross-Origin-Opener-Policy` ni el control de cache de `sw.js` (GitHub usa 10 minutos, así que una versión nueva puede tardar ese tiempo en detectarse). Los enlaces directos responden con estado 404 aunque la app se abre bien. Los datos de los usuarios son por dominio: los de `salereee.github.io` no se ven en otro dominio (exportar/importar para moverlos).
-
 ## Decisiones de publicación
 
-Se controlan con variables de entorno en Cloudflare (**Settings → Variables and Secrets**) o en `.env.production.local`; ninguna es secreta. Ver `.env.example`.
+Se controlan con variables de entorno: en GitHub Pages, en el paso **Build** de [`.github/workflows/pages.yml`](.github/workflows/pages.yml) (`VITE_SITE_URL` ya se calcula sola); en local, en `.env.production.local`. Ninguna es secreta. Ver `.env.example`.
 
 | Variable | Efecto | Por defecto |
 | --- | --- | --- |

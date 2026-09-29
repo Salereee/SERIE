@@ -76,8 +76,12 @@ export async function ensureSeed(target: SerieDB = db): Promise<Settings> {
     }
     if ((settings.seedVersion ?? 0) < EXERCISE_SEED_VERSION) {
       const existing = await target.exercises.bulkGet(SEED_EXERCISES.map((e) => e.id));
-      // Conserva la marca de archivado si el usuario ya la tenía.
-      const merged = SEED_EXERCISES.map((e, i) => (existing[i]?.archived ? { ...e, archived: true } : e));
+      // Conserva lo que el usuario agregó a un ejercicio predefinido: archivado y nota.
+      const merged = SEED_EXERCISES.map((e, i) => ({
+        ...e,
+        ...(existing[i]?.archived ? { archived: true } : {}),
+        ...(existing[i]?.note ? { note: existing[i]!.note } : {}),
+      }));
       await target.exercises.bulkPut(merged);
       settings = { ...settings, seedVersion: EXERCISE_SEED_VERSION };
       await target.settings.put(settings);

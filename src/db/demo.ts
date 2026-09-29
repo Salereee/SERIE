@@ -96,11 +96,13 @@ export async function loadDemoData(weeks = 10): Promise<void> {
         if (st && it.exerciseId === 'press-militar' && remaining < 14) {
           st = { w: st.w, reps: st.reps.map((r) => Math.max(3, r - 1)) };
         } else if (!st) {
-          st = { w: START[it.exerciseId] ?? (ex.region === 'inferior' ? 60 : 20), reps: Array(it.targetSets).fill(it.repMin) };
+          // Arranca en la parte baja del rango, no siempre en el mínimo exacto.
+          const r0 = it.repMin + Math.floor(rand() * Math.max(1, Math.floor((it.repMax - it.repMin) / 2) + 1));
+          st = { w: START[it.exerciseId] ?? (ex.region === 'inferior' ? 60 : 20), reps: Array(it.targetSets).fill(r0) };
         } else if (st.reps.every((r) => r >= it.repMax)) {
           st = { w: st.w + inc, reps: Array(it.targetSets).fill(it.repMin) };
         } else {
-          st = { w: st.w, reps: st.reps.map((r, i) => Math.min(it.repMax, r + (rand() < 0.6 - i * 0.12 ? 1 : 0))) };
+          st = { w: st.w, reps: st.reps.map((r, i) => Math.min(it.repMax, r + (rand() < 0.8 - i * 0.08 ? 1 : 0))) };
         }
         // Curl con barra: la última vez llegó al tope en todas las series.
         if (it.exerciseId === 'curl-barra' && remaining < 3) st = { w: st.w, reps: st.reps.map(() => it.repMax) };

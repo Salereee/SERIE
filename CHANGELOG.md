@@ -2,9 +2,26 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/); versiones con [SemVer](https://semver.org/lang/es/). La versión actual se ve en **Ajustes**.
 
-## [Sin publicar]
+## [1.0.2] — 2026-09-28
 
-Material de lanzamiento, publicación en GitHub Pages y orden de la interfaz. Los datos guardados no cambian de formato.
+Nuevo hogar en GitHub Pages (`/SERIE/`), funciones pequeñas para la sesión, orden de la interfaz y material de lanzamiento. Los datos guardados siguen siendo compatibles: los campos nuevos son opcionales.
+
+### Sesión
+- **Deshacer** al marcar una serie: regresa la serie, lo que heredaron las siguientes, el ejercicio en foco y el descanso.
+- **Discos por lado** en los ejercicios con barra, para la serie que sigue. El peso de la barra se elige en Ajustes → Entrenamiento (20, 15, 10 kg o sin barra; 45, 35, 25 lb).
+- **Nota por ejercicio** (“asiento en 4, agarre cerrado”) que aparece cada vez que haces ese ejercicio. Viaja en el respaldo y sobrevive a las actualizaciones del catálogo.
+
+### Modo básico
+- Botones “?” con una explicación corta de Volumen, Récords, Sugerencia y Calentamiento.
+- La sugerencia de descarga ya no menciona el 1RM estimado.
+
+### Datos de ejemplo
+- La progresión de ejemplo avanza a un ritmo realista: varios ejercicios suben de peso en las 10 semanas, así las gráficas del modo básico no salen planas.
+
+### Publicación
+- GitHub Pages es el sitio oficial; Cloudflare Pages queda como alternativa documentada.
+- `VITE_SITE_URL` se calcula en el workflow con el dominio en minúsculas.
+- Capturas nuevas en la página de presentación, en la ventana de instalación y en el README.
 
 ### Interfaz
 - Listas largas recortadas con desvanecido y botón “Ver los N…” (Biblioteca, selector de ejercicios, Historial por mes, Progreso, Hoy, recomendación de programa).

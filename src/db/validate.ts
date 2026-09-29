@@ -17,6 +17,7 @@ export const MAX_BACKUP_BYTES = 20 * 1024 * 1024;
 export const MAX_ITEMS = 100_000;
 const MAX_TEXT = 2000;
 const MAX_NAME = 120;
+export const MAX_NOTE = 500;
 const MAX_WEIGHT_KG = 2000;
 const MAX_REPS = 1000;
 /** 2000-01-01 … 2100-01-01 en ms. */
@@ -72,7 +73,7 @@ const ts = (v: unknown, path: string, optional = false) => num(v, path, MIN_TS, 
 const id = (v: unknown, path: string) => str(v, path, 100);
 
 function validateExercise(v: unknown, p: string): Exercise {
-  const o = obj(v, p, ['id', 'name', 'primaryMuscle', 'secondaryMuscles', 'equipment', 'kind', 'region', 'isCustom', 'archived', 'custom'], ['id', 'name', 'primaryMuscle', 'secondaryMuscles', 'equipment', 'kind', 'region', 'isCustom']);
+  const o = obj(v, p, ['id', 'name', 'primaryMuscle', 'secondaryMuscles', 'equipment', 'kind', 'region', 'isCustom', 'archived', 'custom', 'note'], ['id', 'name', 'primaryMuscle', 'secondaryMuscles', 'equipment', 'kind', 'region', 'isCustom']);
   id(o.id, `${p}.id`);
   str(o.name, `${p}.name`);
   oneOf(o.primaryMuscle, `${p}.primaryMuscle`, MUSCLES);
@@ -82,6 +83,7 @@ function validateExercise(v: unknown, p: string): Exercise {
   oneOf(o.region, `${p}.region`, ['superior', 'inferior', 'core']);
   bool(o.isCustom, `${p}.isCustom`);
   bool(o.archived, `${p}.archived`, true);
+  str(o.note, `${p}.note`, MAX_NOTE, { optional: true, nonEmpty: false });
   oneOf(o.custom, `${p}.custom`, [0, 1], true);
   if (o.isCustom && !String(o.id).startsWith('custom-')) fail(`${p}.id`, 'los ejercicios propios deben empezar con "custom-"');
   return o as unknown as Exercise;
@@ -186,7 +188,7 @@ function validateSettings(v: unknown, p: string): Settings {
   const o = obj(
     v,
     p,
-    ['id', 'mode', 'unit', 'incrementUpperKg', 'incrementLowerKg', 'defaultRestSec', 'sound', 'vibration', 'theme', 'activeProgramId', 'onboardingDone', 'questionnaire', 'seedVersion', 'lastExportAt', 'exportReminderSnoozedUntil', 'installHintSeen', 'effortTracking'],
+    ['id', 'mode', 'unit', 'incrementUpperKg', 'incrementLowerKg', 'defaultRestSec', 'sound', 'vibration', 'theme', 'activeProgramId', 'onboardingDone', 'questionnaire', 'seedVersion', 'lastExportAt', 'exportReminderSnoozedUntil', 'installHintSeen', 'effortTracking', 'barKg'],
     ['id', 'mode', 'unit', 'incrementUpperKg', 'incrementLowerKg', 'defaultRestSec', 'sound', 'vibration', 'theme', 'onboardingDone'],
   );
   oneOf(o.id, `${p}.id`, ['app']);
@@ -205,6 +207,7 @@ function validateSettings(v: unknown, p: string): Settings {
   ts(o.exportReminderSnoozedUntil, `${p}.exportReminderSnoozedUntil`, true);
   bool(o.installHintSeen, `${p}.installHintSeen`, true);
   bool(o.effortTracking, `${p}.effortTracking`, true);
+  num(o.barKg, `${p}.barKg`, 0, 50, { optional: true });
   if (o.questionnaire !== undefined) {
     const q = obj(o.questionnaire, `${p}.questionnaire`, ['daysPerWeek', 'experience', 'goal', 'equipment'], ['daysPerWeek', 'experience', 'goal', 'equipment']);
     num(q.daysPerWeek, `${p}.questionnaire.daysPerWeek`, 1, 7, { int: true });

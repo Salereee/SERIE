@@ -131,6 +131,34 @@ export function completeSet(id: string, exIdx: number, setIdx: number, restFallb
   });
 }
 
+/** Lo necesario para deshacer un "✓": las series del ejercicio, el foco y el descanso de antes. */
+export interface CompleteSnapshot {
+  exIdx: number;
+  sets: SetEntry[];
+  focusIndex?: number;
+  restTimer?: Session['restTimer'];
+}
+
+export const snapshotBeforeComplete = (s: Session, exIdx: number): CompleteSnapshot => ({
+  exIdx,
+  sets: structuredClone(s.exercises[exIdx].sets),
+  focusIndex: s.focusIndex,
+  restTimer: s.restTimer ? { ...s.restTimer } : s.restTimer,
+});
+
+/**
+ * Deshace un "✓": regresa las series de ese ejercicio (incluido lo que se heredó a las siguientes),
+ * el ejercicio en foco y el descanso a como estaban. No toca los demás ejercicios.
+ */
+export const undoComplete = (id: string, snap: CompleteSnapshot) =>
+  mutate(id, (s) => {
+    const ex = s.exercises[snap.exIdx];
+    if (!ex) return;
+    ex.sets = snap.sets;
+    s.focusIndex = snap.focusIndex;
+    s.restTimer = snap.restTimer ?? null;
+  });
+
 export const uncompleteSet = (id: string, exIdx: number, setIdx: number) =>
   mutate(id, (s) => {
     const set = s.exercises[exIdx]?.sets[setIdx];

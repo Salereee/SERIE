@@ -6,6 +6,7 @@ import { updateSettings, useSettings } from '../../db/hooks';
 import type { Settings, Theme, Unit } from '../../db/schema';
 import { fmtClock, fmtRelativeDay } from '../../domain/format';
 import { INCREMENT_OPTIONS, switchUnit } from '../../domain/unitSwitch';
+import { BAR_OPTIONS, barKgFor } from '../../domain/plates';
 import { KG_PER_LB, fromDisplay, toDisplay } from '../../domain/units';
 import { previewSound, unlockAudio, vibrate } from '../../hooks/audio';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
@@ -50,6 +51,12 @@ export function SettingsPage() {
     const opts = INCREMENT_OPTIONS[s.unit].map((v) => fromDisplay(v, s.unit));
     return opts.some((o) => near(o, current)) ? opts : [...opts, current].sort((a, b) => a - b);
   };
+
+  const bar = barKgFor(s.barKg, s.unit);
+  const barOptions = (() => {
+    const opts = BAR_OPTIONS[s.unit].map((v) => fromDisplay(v, s.unit));
+    return opts.some((o) => near(o, bar)) ? opts : [...opts, bar].sort((a, b) => b - a);
+  })();
 
   const incSelect = (label: string, value: number, key: 'incrementUpperKg' | 'incrementLowerKg') => (
     <label className="field">
@@ -125,6 +132,20 @@ export function SettingsPage() {
                 {incSelect('Tren superior', s.incrementUpperKg, 'incrementUpperKg')}
                 {incSelect('Tren inferior', s.incrementLowerKg, 'incrementLowerKg')}
               </div>
+            </Row>
+            <Row title="Peso de la barra" hint="Para calcular los discos por lado en los ejercicios con barra.">
+              <select
+                className="select input--num"
+                aria-label="Peso de la barra"
+                value={String(barOptions.find((o) => near(o, bar)) ?? bar)}
+                onChange={(e) => set({ barKg: Number(e.target.value) })}
+              >
+                {barOptions.map((o) => (
+                  <option key={o} value={o}>
+                    {o === 0 ? 'Sin barra (solo discos)' : `${fmtInc(o)} ${s.unit}`}
+                  </option>
+                ))}
+              </select>
             </Row>
             <Row title="Descanso por defecto" hint="Para ejercicios agregados sobre la marcha. Cada ejercicio de un programa usa su propio descanso.">
               <select className="select input--num" value={s.defaultRestSec} onChange={(e) => set({ defaultRestSec: Number(e.target.value) })} aria-label="Descanso por defecto">

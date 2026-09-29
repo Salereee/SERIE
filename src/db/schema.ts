@@ -73,6 +73,8 @@ export interface Exercise {
   region: Region;
   isCustom: boolean;
   archived?: boolean;
+  /** Nota fija del usuario (ajustes de máquina, agarre…); se muestra cada vez que haces el ejercicio. */
+  note?: string;
   /** Índice auxiliar (0/1) porque IndexedDB no indexa booleanos. */
   custom?: 0 | 1;
 }
@@ -209,6 +211,8 @@ export interface Settings {
   installHintSeen?: boolean;
   /** Modo avanzado: anotar RIR/RPE por serie. Sin valor = sí. */
   effortTracking?: boolean;
+  /** Peso de la barra para la calculadora de discos (kg). Sin valor = 20 kg, o 45 lb si la unidad es lb. */
+  barKg?: number;
 }
 
 /** RIR y RPE solo se piden en modo avanzado y si el usuario no los apagó. */

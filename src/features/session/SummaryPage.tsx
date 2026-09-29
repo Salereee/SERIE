@@ -12,6 +12,7 @@ import { Icon } from '../../ui/Icon';
 import { PRRow } from '../today/TodayPage';
 import '../today/today.css';
 import './summary.css';
+import { Help } from '../../ui/Help';
 
 export function SummaryPage() {
   const { id } = useParams();
@@ -66,7 +67,7 @@ export function SessionReport({ session, headline }: { session: Session; headlin
           <span className="num-lg">{fmtDuration(session.durationSec ?? 0)}</span>
         </div>
         <div className="stat">
-          <span className="eyebrow">Volumen</span>
+          <span className="eyebrow">Volumen <Help term="volumen" /></span>
           <span className="num-lg">
             {headline ? <CountUp value={session.summary?.volumeKg ?? 0} format={(n) => fmtVolume(n, unit)} delay={120} /> : fmtVolume(session.summary?.volumeKg ?? 0, unit)}
             <span className="unit">{unit}</span>

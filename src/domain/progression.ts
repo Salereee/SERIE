@@ -60,7 +60,7 @@ export function suggest(input: ProgressionInput): Suggestion | null {
       kind: 'deload',
       weightKg: dw,
       reps: repMin,
-      reason: `Tu 1RM estimado bajó 3 sesiones seguidas: baja ~10 % a ${fmtWeight(dw, u)} ${u} y reconstruye.`,
+      reason: `Tu mejor serie (peso y reps combinados) bajó 3 sesiones seguidas: baja ~10 % a ${fmtWeight(dw, u)} ${u} y reconstruye.`,
     };
   }
   if (t === 'mantener') {

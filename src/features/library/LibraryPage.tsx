@@ -120,6 +120,12 @@ function ExerciseDetail({ exercise: e, onEdit, onDeleted, hideTitle }: { exercis
         <dt className="eyebrow">Tipo</dt>
         <dd>{e.kind === 'compuesto' ? 'Compuesto' : 'Aislamiento'}</dd>
       </dl>
+      {e.note && (
+        <p className="exnote">
+          <Icon name="edit" size={16} />
+          <span>{e.note}</span>
+        </p>
+      )}
       {logs.length > 0 ? (
         <div className="stat-row" style={{ '--cols': 2 } as React.CSSProperties}>
           <div className="stat">
