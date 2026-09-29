@@ -82,7 +82,7 @@ const desktop = (t, th) => `${base(t, 1200, 800)}
 <div style="position:absolute;left:56px;right:70px;top:104px;border:2px solid ${t.ink};background:${t.bg};box-shadow:14px 14px 0 ${t.soft}">
   <div style="display:flex;align-items:center;gap:8px;height:38px;padding:0 14px;border-bottom:2px solid ${t.ink}">
     <i style="width:10px;height:10px;border:2px solid ${t.ink}"></i><i style="width:10px;height:10px;border:2px solid ${t.ink}"></i><i style="width:10px;height:10px;background:${t.accent}"></i>
-    <span class="mono" style="font-size:13px;color:${t.muted};margin-left:14px">salereee.github.io/serie</span>
+    <span class="mono" style="font-size:13px;color:${t.muted};margin-left:14px">salereee.github.io/SERIE</span>
   </div>
   <img src="${shot('escritorio', th)}" style="display:block;width:100%">
 </div>`;

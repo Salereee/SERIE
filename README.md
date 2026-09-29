@@ -7,14 +7,14 @@
 </h1>
 
 <p align="center">
-  <a href="https://salereee.github.io/serie/"><b>Abrir la app</b></a> ·
-  <a href="https://salereee.github.io/serie/inicio/">Página del proyecto</a> ·
+  <a href="https://salereee.github.io/SERIE/"><b>Abrir la app</b></a> ·
+  <a href="https://salereee.github.io/SERIE/inicio/">Página del proyecto</a> ·
   <a href="#correr-en-local">Correr en local</a> ·
   <a href="CHANGELOG.md">Cambios</a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/Salereee/serie/actions/workflows/pages.yml"><img alt="Despliegue en GitHub Pages" src="https://github.com/Salereee/serie/actions/workflows/pages.yml/badge.svg"></a>
+  <a href="https://github.com/Salereee/SERIE/actions/workflows/pages.yml"><img alt="Despliegue en GitHub Pages" src="https://github.com/Salereee/SERIE/actions/workflows/pages.yml/badge.svg"></a>
   <img alt="PWA instalable" src="https://img.shields.io/badge/PWA-instalable-ff5a1f?style=flat-square&labelColor=0e0e0d">
   <img alt="Sin cuentas" src="https://img.shields.io/badge/datos-solo_en_tu_dispositivo-f2f1ec?style=flat-square&labelColor=0e0e0d">
   <img alt="React 18" src="https://img.shields.io/badge/React-18-f2f1ec?style=flat-square&labelColor=0e0e0d&logo=react">
@@ -118,7 +118,7 @@ La primera vez, Wrangler abre el navegador para iniciar sesión en Cloudflare y 
 
 - `public/_headers`: CSP estricta (solo recursos propios), `frame-ancestors 'none'`, `nosniff`, `Referrer-Policy`, `Permissions-Policy` (solo *wake lock*; cámara, micrófono y ubicación bloqueados) y cache largo para `/assets/*`.
 - `public/_redirects`: **sin reglas** (solo comentarios). Las rutas de la app (`/progreso`, `/historial/…`) funcionan al recargar gracias al modo SPA de Cloudflare Pages: si no hay `404.html` en la raíz (Vite no lo genera), Pages responde `index.html` a cualquier ruta que no sea un archivo. La regla clásica `/* /index.html 200` no se usa: Pages la descarta al publicar (“Infinite loop detected…”) y, si se aplicara, taparía `/inicio/`, porque en `_redirects` “las reglas se siguen aunque exista el archivo”.
-- **`/inicio/`: página de presentación** (bilingüe ES/EN) para compartir. Es HTML estático en `public/inicio/` (con su `inicio.css`, `inicio.js`, fuentes e imágenes), sin estilos ni scripts en línea para cumplir la misma CSP estricta. Usa rutas relativas y sus botones “Abrir SERIE” llevan a `../`, así funciona igual en la raíz de un dominio y en `/serie/inicio/` (GitHub Pages). El service worker no la guarda ni la sustituye por la app (`navigateFallbackDenylist`), así que sin conexión no está disponible. En `npm run dev` y `npm run preview` también funciona (`/inicio` redirige a `/inicio/`, como en Pages). Se enlaza desde Ajustes → Acerca de.
+- **`/inicio/`: página de presentación** (bilingüe ES/EN) para compartir. Es HTML estático en `public/inicio/` (con su `inicio.css`, `inicio.js`, fuentes e imágenes), sin estilos ni scripts en línea para cumplir la misma CSP estricta. Usa rutas relativas y sus botones “Abrir SERIE” llevan a `../`, así funciona igual en la raíz de un dominio y en `/SERIE/inicio/` (GitHub Pages). El service worker no la guarda ni la sustituye por la app (`navigateFallbackDenylist`), así que sin conexión no está disponible. En `npm run dev` y `npm run preview` también funciona (`/inicio` redirige a `/inicio/`, como en Pages). Se enlaza desde Ajustes → Acerca de.
 - **Íconos y capturas:** `favicon.ico` + `favicon-16/32/48.png` para navegadores sin SVG; `screenshots/` (4 de celular, 2 de escritorio) para la ventana de instalación enriquecida del manifest, que además define accesos directos a Progreso e Historial. Ni las capturas, ni `og.png`/`og-en.png`, ni los favicons PNG, ni `/inicio/` entran al precache del service worker.
 - **SEO:** `index.html` lleva `canonical`, `og:url`, `twitter:*` y datos estructurados `WebApplication` (JSON-LD; es un bloque de datos, la CSP no lo bloquea). Con `ALLOW_INDEXING=true` y `VITE_SITE_URL` definida se publican `sitemap.xml` (`/` y `/inicio/`, con la fecha del build) y la línea `Sitemap:` en `robots.txt`. `og-en.png` es la variante en inglés de la imagen para compartir; hoy no la usa ninguna página.
 
@@ -130,7 +130,7 @@ La primera vez, Wrangler abre el navegador para iniciar sesión en Cloudflare y 
 
 ## Despliegue en GitHub Pages
 
-Publicada en **<https://salereee.github.io/serie/>**. La página de presentación del proyecto está en **<https://salereee.github.io/serie/inicio/>**.
+Publicada en **<https://salereee.github.io/SERIE/>**. La página de presentación del proyecto está en **<https://salereee.github.io/SERIE/inicio/>**.
 
 El workflow [`.github/workflows/pages.yml`](.github/workflows/pages.yml) corre tests y contraste, compila y publica en cada push a `main` (o a mano desde **Actions → GitHub Pages → Run workflow**). En el repo, **Settings → Pages → Source** debe ser **GitHub Actions**.
 
@@ -139,7 +139,9 @@ GitHub Pages sirve el sitio en una subruta (`/<repo>/`) y no tiene cabeceras pro
 | Variable | Efecto |
 | --- | --- |
 | `BASE_PATH` | Subruta de la app (el workflow usa el nombre del repo). Ajusta rutas de assets, router, manifest (`start_url`, `scope`, accesos directos) y el service worker. Vacía = raíz, como en Cloudflare |
-| `GITHUB_PAGES=true` | Pone la CSP en una etiqueta `<meta>`, copia `index.html` a `404.html` (así funcionan los enlaces directos como `/serie/progreso`), agrega `.nojekyll` y quita `_headers`/`_redirects` |
+| `GITHUB_PAGES=true` | Pone la CSP en una etiqueta `<meta>`, copia `index.html` a `404.html` (así funcionan los enlaces directos como `/SERIE/progreso`), agrega `.nojekyll` y quita `_headers`/`_redirects` |
+
+La subruta distingue mayúsculas y sale del nombre del repo: si lo renombras, la URL cambia y hay que volver a desplegar (**Actions → GitHub Pages → Run workflow**). Los datos de quien usaba la URL anterior se quedan en esa URL.
 
 Para probarlo en local:
 
