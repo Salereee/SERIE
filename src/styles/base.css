@@ -180,15 +180,6 @@ ol {
   line-height: 1.25;
 }
 
-.num-xl {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-weight: 500;
-  font-size: clamp(44px, 12vw, 80px);
-  letter-spacing: -0.05em;
-  line-height: 0.9;
-}
-
 .num-lg {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
@@ -257,8 +248,7 @@ h3,
 .title-lg,
 .title-md,
 .title-sm,
-.empty__title,
-.panel__name {
+.empty__title {
   text-wrap: balance;
 }
 p,

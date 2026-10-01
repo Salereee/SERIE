@@ -364,7 +364,7 @@ function DayColumn({ day, index, desktop, exName, onRename, onAdd, onMenu, onIte
   return (
     <section className="bday" aria-label={day.name}>
       <div className="bday__head">
-        <span className="mono small">{String(index + 1).padStart(2, '0')}</span>
+        <span className="tnum small muted">{index + 1}</span>
         <input
           key={day.name}
           className="bday__name"

@@ -84,18 +84,17 @@
 .route .list > li,
 .route .today__items > li,
 .route .days-table__day,
-.route .exlist > li,
 .route .stat-row > .stat {
   animation: enter-rise var(--t-base) var(--ease) both;
 }
-.route :is(.list, .today__items, .days-table, .exlist, .stat-row) > :nth-child(2) { animation-delay: 35ms; }
-.route :is(.list, .today__items, .days-table, .exlist, .stat-row) > :nth-child(3) { animation-delay: 70ms; }
-.route :is(.list, .today__items, .days-table, .exlist, .stat-row) > :nth-child(4) { animation-delay: 105ms; }
-.route :is(.list, .today__items, .days-table, .exlist, .stat-row) > :nth-child(5) { animation-delay: 140ms; }
-.route :is(.list, .today__items, .days-table, .exlist, .stat-row) > :nth-child(6) { animation-delay: 175ms; }
-.route :is(.list, .today__items, .days-table, .exlist, .stat-row) > :nth-child(7) { animation-delay: 210ms; }
-.route :is(.list, .today__items, .days-table, .exlist, .stat-row) > :nth-child(8) { animation-delay: 245ms; }
-.route :is(.list, .today__items, .days-table, .exlist, .stat-row) > :nth-child(n + 9) { animation-delay: 280ms; }
+.route :is(.list, .today__items, .days-table, .stat-row) > :nth-child(2) { animation-delay: 35ms; }
+.route :is(.list, .today__items, .days-table, .stat-row) > :nth-child(3) { animation-delay: 70ms; }
+.route :is(.list, .today__items, .days-table, .stat-row) > :nth-child(4) { animation-delay: 105ms; }
+.route :is(.list, .today__items, .days-table, .stat-row) > :nth-child(5) { animation-delay: 140ms; }
+.route :is(.list, .today__items, .days-table, .stat-row) > :nth-child(6) { animation-delay: 175ms; }
+.route :is(.list, .today__items, .days-table, .stat-row) > :nth-child(7) { animation-delay: 210ms; }
+.route :is(.list, .today__items, .days-table, .stat-row) > :nth-child(8) { animation-delay: 245ms; }
+.route :is(.list, .today__items, .days-table, .stat-row) > :nth-child(n + 9) { animation-delay: 280ms; }
 
 /* Titulares grandes: suben desde su línea base. */
 .route .title-xl,

@@ -12,7 +12,7 @@ Marca cada casilla al terminar. Si algo no coincide con el resultado esperado, a
   **Esperado:** ícono negro con la barra naranja y el nombre “SERIE”. Al abrirlo: pantalla completa, sin barra de Safari. Ajustes dice “Ya la estás usando instalada”.
 - [ ] **A3. Datos al instalar.** Antes de instalar, registra una sesión corta en Safari. Luego abre la app instalada.
   **Esperado:** en iOS 17 o más reciente la app instalada **no** comparte datos con Safari (es otro almacenamiento). Esto es normal: usa Exportar en Safari e Importar en la app instalada si quieres pasarlos. Anota tu versión de iOS.
-- [ ] **A4. Fin del descanso sin vibración.** Empieza una sesión, registra una serie y deja correr el descanso (usa −15 para acortarlo).
+- [ ] **A4. Fin del descanso sin vibración.** Empieza una sesión, registra una serie y deja correr el descanso (toca el reloj y usa −15 s para acortarlo).
   **Esperado:** en los últimos 3 s las cifras cambian a naranja y suenan tics. Al llegar a cero, suenan dos pulsos, la pantalla destella en naranja y la barra se vuelve naranja con “Descanso terminado”. No vibra (iOS no lo permite).
 - [ ] **A5. Silencio.** Repite A4 con el interruptor de silencio activado.
   **Esperado:** no suena nada, pero el destello y la barra naranja se ven claramente.
@@ -116,18 +116,18 @@ Marca cada casilla al terminar. Si algo no coincide con el resultado esperado, a
 
 - [ ] **J1. Deshacer.** En una sesión, toca ✓ en una serie y luego “Deshacer” en el aviso.
   **Esperado:** la serie vuelve a pendiente, el descanso desaparece (o vuelve al anterior) y el acordeón regresa al mismo ejercicio.
-- [ ] **J2. Discos por lado.** En un ejercicio con barra, escribe 102.5 kg en la serie que sigue.
+- [ ] **J2. Discos por lado.** En un ejercicio con barra, escribe 102.5 kg en la serie que sigue y abre “···”.
   **Esperado:** “Discos por lado” muestra 25 · 15 · 1.25. Con la unidad en lb y 225 lb: 45 · 45.
 - [ ] **J3. Barra.** Ajustes → Entrenamiento → Peso de la barra → 15 kg.
   **Esperado:** los discos se recalculan; con “Sin barra” se reparte todo el peso.
-- [ ] **J4. Nota del ejercicio.** En la sesión, toca “Nota”, escribe algo y guarda. Termina la sesión y empieza otra con ese ejercicio.
-  **Esperado:** la nota aparece arriba del ejercicio; también en la ficha de la Biblioteca. Exporta e importa un respaldo: la nota sigue ahí.
-- [ ] **J5. Ayudas del modo básico.** En modo básico toca los “?” (Sugerencia, Volumen, Récords, Calentamiento).
-  **Esperado:** una hoja con la explicación. En modo avanzado los “?” no aparecen.
+- [ ] **J4. Nota del ejercicio.** En la sesión, toca “···” → “Nota del ejercicio”, escribe algo y guarda. Termina la sesión y empieza otra con ese ejercicio.
+  **Esperado:** la nota aparece bajo el nombre del ejercicio; también en la ficha de Rutinas → Ejercicios. Exporta e importa un respaldo: la nota sigue ahí.
+- [ ] **J5. Ayudas del modo básico.** En modo básico toca los “?” (Sugerencia, Volumen, Récords).
+  **Esperado:** una hoja con la explicación. En modo avanzado solo queda el “?” del 1RM estimado en el progreso por ejercicio.
 
 ## K. Entre dispositivos (1.1.0)
 
-- [ ] **K1. Rutina al computador.** En el celular: Programas → una rutina → Compartir → Enviar enlace (a ti mismo por WhatsApp o correo). Ábrelo en la computadora.
+- [ ] **K1. Rutina al computador.** En el celular: Rutinas → una rutina → “···” → Compartir → Enviar enlace (a ti mismo por WhatsApp o correo). Ábrelo en la computadora.
   **Esperado:** la computadora muestra la rutina completa; “Guardar rutina” la agrega y, si nunca habías usado SERIE ahí, Hoy ya sugiere su primer día.
 - [ ] **K2. QR a otro celular.** Escanea el QR de Compartir con la cámara de otro teléfono.
   **Esperado:** abre SERIE con la misma vista previa.
@@ -135,3 +135,18 @@ Marca cada casilla al terminar. Si algo no coincide con el resultado esperado, a
   **Esperado:** “El enlace está incompleto o dañado”; no se guarda nada.
 - [ ] **K4. Todo con historial.** Ajustes → Datos y respaldo → Enviar respaldo. En el otro dispositivo, bienvenida → “Importar tu respaldo” → Importar JSON → Reemplazar.
   **Esperado:** aparecen sesiones, programas y récords; al volver a Hoy no pide la bienvenida.
+
+## L. Rediseño minimal (1.2.0)
+
+- [ ] **L1. Hoy sin scroll.** Con los datos de ejemplo, abre Hoy en un celular de 390 × 844 (iPhone 12–15).
+  **Esperado:** se ve qué toca, la semana, los tres primeros ejercicios y “Empezar” sin desplazarte. “Cambiar de día” ofrece los días y Sesión libre.
+- [ ] **L2. Primera serie arriba.** Empieza una sesión.
+  **Esperado:** la tarjeta de la primera serie queda en el tercio superior, con “la vez pasada” y la píldora “Sugerido”. Tocar la píldora llena peso y reps.
+- [ ] **L3. Serie hecha.** Registra una serie y toca su línea.
+  **Esperado:** se abre para editar peso y reps; al salir de ella se vuelve a plegar. El ✓ la desmarca.
+- [ ] **L4. Descanso.** Registra una serie y toca el reloj del descanso.
+  **Esperado:** hoja con −15 s, +15 s y Saltar; al terminar el descanso la hoja se cierra sola.
+- [ ] **L5. Notas.** Termina una sesión y escribe en “Notas de la sesión” del resumen.
+  **Esperado:** la nota aparece en el detalle de esa sesión en Progreso → Historial.
+- [ ] **L6. Rutas viejas.** Abre `/mas`, `/biblioteca` y `/historial` directamente.
+  **Esperado:** `/mas` lleva a Ajustes; los otros dos abren su segmento (Ejercicios, Historial) con la pestaña correcta marcada.

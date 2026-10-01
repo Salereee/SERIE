@@ -101,7 +101,7 @@ export function SessionReport({ session, headline }: { session: Session; headlin
             <h2 id="ej-title" className="eyebrow eyebrow--ink">
               Ejercicios
             </h2>
-            <span className="eyebrow mono">{session.exercises.length}</span>
+            <span>{session.exercises.length}</span>
           </div>
           <table className="report__table">
             <thead>
