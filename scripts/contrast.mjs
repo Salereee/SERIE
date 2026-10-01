@@ -38,7 +38,15 @@ const PAIRS = [
   ['danger', 'surface', 4.5, 'errores en formularios'],
   ['focus', 'bg', 3, 'anillo de foco (no texto)'],
   ['accent', 'bg', 3, 'barra de serie activa y puntos PR (no texto)'],
-  ['line', 'bg', 3, 'bordes de inputs (no texto)'],
+  ['line', 'bg', 3, 'texto sobre la regla de la bienvenida (no texto)'],
+  // 1.2.0: superficies y aire en lugar de reglas en tinta.
+  ['ink-2', 'surface', 4.5, 'encabezados de sección dentro de tarjetas'],
+  ['ink-2', 'fill', 4.5, 'botones secundarios y segmentado sin elegir'],
+  ['muted', 'bg', 3, 'borde de inputs y selects (no texto)'],
+  ['muted', 'fill', 3, 'borde de inputs contra su propio relleno (no texto)'],
+  ['danger', 'fill', 4.5, 'botón secundario de borrar'],
+  ['accent', 'fill', 3, 'relleno de la barra de progreso de la sesión (no texto)'],
+  ['bg', 'ink', 4.5, 'segmentado y chip elegidos'],
 ];
 
 let bad = 0;

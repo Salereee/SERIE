@@ -111,23 +111,39 @@ ol {
 
 /* ——— Tipografía ——— */
 
+/* Metadatos: sentence case, 15 px, tenue. Las mayúsculas espaciadas quedan solo para la etiqueta PR y la bienvenida. */
 .eyebrow {
   font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.eyebrow--ink {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.eyebrow--caps {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--muted);
 }
 
-.eyebrow--ink {
-  color: var(--ink);
-}
-
+/* Cifras vivas (peso, reps, relojes, cifra héroe): mono. */
 .mono {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   font-feature-settings: 'zero' 0;
+}
+
+/* Fechas, índices y conteos: misma fuente del texto, con cifras tabulares. */
+.tnum {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
 }
 
 .display {
@@ -137,40 +153,31 @@ ol {
 }
 
 .title-xl {
-  font-size: clamp(40px, 11vw, 88px);
+  font-size: 34px;
   font-weight: 700;
-  letter-spacing: -0.045em;
-  line-height: 0.9;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
 }
 
 .title-lg {
-  font-size: clamp(30px, 7vw, 48px);
+  font-size: 28px;
   font-weight: 700;
-  letter-spacing: -0.035em;
-  line-height: 0.95;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
 }
 
 .title-md {
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
 .title-sm {
   font-size: 17px;
   font-weight: 600;
   letter-spacing: -0.01em;
-  line-height: 1.2;
-}
-
-.num-xl {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-weight: 500;
-  font-size: clamp(44px, 12vw, 80px);
-  letter-spacing: -0.05em;
-  line-height: 0.9;
+  line-height: 1.25;
 }
 
 .num-lg {
@@ -192,12 +199,11 @@ ol {
 
 .unit {
   font-family: var(--font-display);
-  font-size: 0.42em;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 0.45em;
+  font-weight: 500;
+  letter-spacing: 0;
   color: var(--muted);
-  margin-left: 0.2em;
+  margin-left: 0.25em;
 }
 
 .muted {
@@ -209,7 +215,7 @@ ol {
 }
 
 .small {
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .lead {
@@ -219,7 +225,7 @@ ol {
   color: var(--ink-2);
 }
 
-/* Número de índice gigante en contorno: firma editorial (día del programa, pasos). */
+/* Número de índice gigante en contorno: solo en la bienvenida. */
 .outline-num {
   font-family: var(--font-mono);
   font-weight: 500;
@@ -242,8 +248,7 @@ h3,
 .title-lg,
 .title-md,
 .title-sm,
-.empty__title,
-.panel__name {
+.empty__title {
   text-wrap: balance;
 }
 p,

@@ -110,12 +110,3 @@ export function Disclosure({ title, summary, aside, open, onToggle, children, st
     </section>
   );
 }
-
-/** Botón "Abrir todo / Cerrar todo" para listas largas. */
-export function ToggleAll({ allOpen, onChange }: { allOpen: boolean; onChange: (open: boolean) => void }) {
-  return (
-    <button type="button" className="link-btn small" onClick={() => onChange(!allOpen)}>
-      {allOpen ? 'Cerrar todo' : 'Abrir todo'}
-    </button>
-  );
-}

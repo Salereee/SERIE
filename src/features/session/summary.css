@@ -58,10 +58,8 @@
   vertical-align: top;
 }
 .report__table thead th {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: 600;
   color: var(--muted);
   border-bottom: var(--b2);
 }

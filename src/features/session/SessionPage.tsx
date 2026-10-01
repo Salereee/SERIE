@@ -5,20 +5,18 @@ import { db } from '../../db/db';
 import { useActiveSession, useExerciseMap, useSettings } from '../../db/hooks';
 import type { Exercise, ExerciseLog, PRKind, Session, SessionExercise, SetEntry, Settings } from '../../db/schema';
 import { showsAdvancedMetrics, showsEffort } from '../../db/schema';
-import { EQUIPMENT_LABEL, MUSCLE_LABEL } from '../../db/schema';
-import { fmtClock, fmtDateShort, fmtRelativeDay } from '../../domain/format';
-import { setsVolume, workSets } from '../../domain/logs';
+import { MUSCLE_LABEL } from '../../db/schema';
+import { fmtClock, fmtDateShort } from '../../domain/format';
 import { suggest, type Suggestion } from '../../domain/progression';
 import { computeRecords, prLabel, setPRs, type Records } from '../../domain/records';
-import { fmtVolume, fmtWeight } from '../../domain/units';
+import { fmtWeight } from '../../domain/units';
 import { haptic, sfx, unlockAudio } from '../../hooks/audio';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useNow } from '../../hooks/useNow';
 import { useWakeLock } from '../../hooks/useWakeLock';
 import { useFeedback } from '../../ui/feedback';
-import { Disclosure, useOpenSections } from '../../ui/Disclosure';
+import { Disclosure } from '../../ui/Disclosure';
 import { Icon } from '../../ui/Icon';
-import { Meta } from '../../ui/Meta';
 import { Sheet } from '../../ui/Sheet';
 import { ExercisePicker } from '../library/ExercisePicker';
 import {
@@ -34,7 +32,6 @@ import {
   removeSet,
   replaceExercise,
   setFocus,
-  setNotes,
   snapshotBeforeComplete,
   supersetMembers,
   uncompleteSet,
@@ -49,7 +46,6 @@ import { SetRow } from './SetRow';
 import { accordionState } from './accordion';
 import { useSessionLock } from './useSessionLock';
 import './session.css';
-import './session-accordion.css';
 import { Help } from '../../ui/Help';
 
 export function SessionPage() {
@@ -102,13 +98,6 @@ function doneWorkSetsBefore(s: Session, exerciseId: string, stopAt?: { ex: numbe
   return out;
 }
 
-const closedByDefault = () => false;
-
-function historySummary(r: Records | undefined, unit: Settings['unit']) {
-  if (!r || r.sessions === 0) return 'Sin registros';
-  return `Récord ${fmtWeight(r.bestWeight, unit)} ${unit} · ${r.sessions} ${r.sessions === 1 ? 'sesión' : 'sesiones'}`;
-}
-
 function ActiveSession({ session }: { session: Session }) {
   const settings = useSettings();
   const exMap = useExerciseMap();
@@ -119,8 +108,9 @@ function ActiveSession({ session }: { session: Session }) {
   const [picker, setPicker] = useState<{ replace?: number } | null>(null);
   const [setMenu, setSetMenu] = useState<{ ex: number; set: number } | null>(null);
   const [exMenu, setExMenu] = useState<number | null>(null);
+  const [noteFor, setNoteFor] = useState<string | null>(null);
+  const [historyFor, setHistoryFor] = useState<number | null>(null);
   const [finishing, setFinishing] = useState(false);
-  const extra = useOpenSections('sesion', closedByDefault);
   const lock = useSessionLock(session.id);
 
   const focus = Math.min(session.focusIndex ?? 0, Math.max(0, session.exercises.length - 1));
@@ -147,16 +137,14 @@ function ActiveSession({ session }: { session: Session }) {
   const totals = useMemo(() => {
     let done = 0;
     let total = 0;
-    let vol = 0;
     for (const e of session.exercises) {
       for (const s of e.sets) {
         if (s.isWarmup) continue;
         total++;
         if (s.done) done++;
       }
-      vol += setsVolume(workSets(e.sets));
     }
-    return { done, total, vol };
+    return { done, total };
   }, [session]);
 
   const onToggle = async (exIdx: number, setIdx: number) => {
@@ -221,23 +209,6 @@ function ActiveSession({ session }: { session: Session }) {
     if (s) navigate(`/sesion/resumen/${s.id}`, { replace: true });
   };
 
-  const stats = (
-    <div className="rest__stats">
-      <span>
-        <span className="eyebrow">Series</span>
-        <span className="mono">
-          {totals.done}/{totals.total}
-        </span>
-      </span>
-      <span>
-        <span className="eyebrow">Volumen</span>
-        <span className="mono">
-          {fmtVolume(totals.vol, settings.unit)} {settings.unit}
-        </span>
-      </span>
-    </div>
-  );
-
   return (
     <div className="page sess">
       {lock.readOnly && (
@@ -252,7 +223,7 @@ function ActiveSession({ session }: { session: Session }) {
         </div>
       )}
       <fieldset className="ro-wrap" disabled={lock.readOnly}>
-      <SessionHeader session={session} onFinish={() => setFinishing(true)} />
+      <SessionHeader session={session} done={totals.done} total={totals.total} onFinish={() => setFinishing(true)} />
 
       {session.exercises.length === 0 ? (
         <div className="empty">
@@ -265,20 +236,16 @@ function ActiveSession({ session }: { session: Session }) {
       ) : (
         <div className="sess__grid">
           <div className="sess__main">
-            <div className="sess__listhead">
-              <span className="eyebrow">
-                {session.exercises.length} ejercicios · {totals.done}/{totals.total} series
-              </span>
-            </div>
             {session.exercises.map((ex, i) => {
               const row = rows[i];
               const exercise = exMap.get(ex.exerciseId);
+              const name = exercise?.name ?? ex.exerciseId;
               const ss = !!ex.supersetGroup && (session.exercises[i - 1]?.supersetGroup === ex.supersetGroup || session.exercises[i + 1]?.supersetGroup === ex.supersetGroup);
+              const complete = row.total > 0 && row.done === row.total;
               return (
                 <Disclosure
                   key={ex.id}
                   variant="row"
-                  sticky={row.open}
                   className="sessx"
                   id={`ejercicio-${i + 1}`}
                   headerRef={(el) => {
@@ -292,19 +259,33 @@ function ActiveSession({ session }: { session: Session }) {
                   }}
                   title={
                     <span className="sessx__title" data-status={row.status}>
-                      <span className="sessx__idx mono">{row.status === 'hecho' ? <Icon name="check" size={16} stroke={2.5} /> : String(i + 1).padStart(2, '0')}</span>
                       <span className="sessx__name">
-                        {ss && <span className="tag">SS</span>} {exercise?.name ?? ex.exerciseId}
+                        {ss && <span className="tag">Superset</span>} {name}
                       </span>
+                      {row.open && (
+                        <span className="sessx__target tnum">
+                          {ex.targetSets ? `${ex.targetSets} × ${ex.repMin}–${ex.repMax}` : 'Sin objetivo'} · descanso {fmtClock(ex.restSec)}
+                        </span>
+                      )}
                     </span>
                   }
                   summary={
-                    <span className="sessx__sum">
-                      <span className="sessx__prog">
+                    row.open ? undefined : complete ? (
+                      <span className="sessx__ok" aria-label={`Completo, ${row.done} de ${row.total}`}>
+                        <Icon name="check" size={18} stroke={2.5} />
+                      </span>
+                    ) : (
+                      <span className="sessx__prog" aria-label={`${row.done} de ${row.total} series`}>
                         {row.done}/{row.total}
                       </span>
-                      {!row.open && <span className="sessx__detail">{row.summary}</span>}
-                    </span>
+                    )
+                  }
+                  aside={
+                    row.open && (
+                      <button className="btn btn--ghost btn--icon" onClick={() => setExMenu(i)} aria-label={`Más opciones de ${name}`}>
+                        <Icon name="more" />
+                      </button>
+                    )
                   }
                 >
                   {row.open && (
@@ -319,8 +300,7 @@ function ActiveSession({ session }: { session: Session }) {
                       onToggle={(j) => onToggle(i, j)}
                       onPatch={(j, patch) => updateSet(session.id, i, j, patch)}
                       onSetMenu={(j) => setSetMenu({ ex: i, set: j })}
-                      onExMenu={() => setExMenu(i)}
-                      onAddSet={(warmup) => addSet(session.id, i, warmup)}
+                      onAddSet={() => addSet(session.id, i, false)}
                     />
                   )}
                 </Disclosure>
@@ -331,44 +311,22 @@ function ActiveSession({ session }: { session: Session }) {
                 <Icon name="plus" /> Agregar ejercicio
               </button>
             </div>
-
-            {!desktop && current && (
-              <div className="sess__extra">
-                <Disclosure
-                  title={`Historial · ${exMap.get(current.exerciseId)?.name ?? ''}`}
-                  summary={historySummary(history.recs.get(current.exerciseId), settings.unit)}
-                  open={extra.isOpen('historial')}
-                  onToggle={(o) => extra.setOpen('historial', o)}
-                >
-                  <HistoryBlock logs={history.by.get(current.exerciseId) ?? []} records={history.recs.get(current.exerciseId)} unit={settings.unit} advanced={showsAdvancedMetrics(settings)} />
-                </Disclosure>
-                <Disclosure
-                  title="Notas de la sesión"
-                  summary={session.notes?.trim() ? session.notes.trim().slice(0, 28) + (session.notes.trim().length > 28 ? '…' : '') : 'Sin notas'}
-                  open={extra.isOpen('notas')}
-                  onToggle={(o) => extra.setOpen('notas', o)}
-                >
-                  <NotesBlock session={session} />
-                </Disclosure>
-              </div>
-            )}
           </div>
 
           {desktop && (
             <aside className="sess__side" aria-label="Contexto del ejercicio">
               {current && (
                 <>
-                  <span className="eyebrow">{exMap.get(current.exerciseId)?.name}</span>
+                  <span className="title-sm">{exMap.get(current.exerciseId)?.name}</span>
                   <HistoryBlock logs={history.by.get(current.exerciseId) ?? []} records={history.recs.get(current.exerciseId)} unit={settings.unit} advanced={showsAdvancedMetrics(settings)} />
                 </>
               )}
-              <NotesBlock session={session} />
             </aside>
           )}
         </div>
       )}
 
-      <RestTimer session={session} stats={stats} />
+      <RestTimer session={session} />
       </fieldset>
 
       {picker && (
@@ -417,46 +375,60 @@ function ActiveSession({ session }: { session: Session }) {
       )}
 
       {exMenu != null && session.exercises[exMenu] && (
-        <Sheet title={exMap.get(session.exercises[exMenu].exerciseId)?.name ?? 'Ejercicio'} eyebrow={`Ejercicio ${exMenu + 1} de ${session.exercises.length}`} onClose={() => setExMenu(null)}>
-          <div className="menu">
-            <button
-              onClick={() => {
-                setPicker({ replace: exMenu });
-                setExMenu(null);
-              }}
-            >
-              <Icon name="swap" /> Reemplazar por otro de {MUSCLE_LABEL[exMap.get(session.exercises[exMenu].exerciseId)?.primaryMuscle ?? 'pecho']}
-            </button>
-            <button disabled={exMenu === 0} onClick={() => (moveExercise(session.id, exMenu, exMenu - 1), setExMenu(null))}>
-              <Icon name="up" /> Mover antes
-            </button>
-            <button disabled={exMenu === session.exercises.length - 1} onClick={() => (moveExercise(session.id, exMenu, exMenu + 1), setExMenu(null))}>
-              <Icon name="down" /> Mover después
-            </button>
-            <Link to={`/progreso/${session.exercises[exMenu].exerciseId}`}>
-              <Icon name="arrow" /> Ver progreso (la sesión sigue abierta)
-            </Link>
-            <button
-              className="menu__danger"
-              onClick={async () => {
-                const i = exMenu;
-                const snapshot = structuredClone(session.exercises[i]);
-                const name = exMap.get(snapshot.exerciseId)?.name;
-                setExMenu(null);
-                const ok = await confirm({
-                  title: `¿Quitar ${name} de la sesión?`,
-                  body: snapshot.sets.some((x) => x.done) ? 'Tiene series registradas; se quitarán también.' : undefined,
-                  confirmLabel: 'Quitar',
-                  danger: true,
-                });
-                if (!ok) return;
-                await removeExercise(session.id, i);
-                toast({ message: 'Ejercicio quitado', onAction: () => mutate(session.id, (s) => void s.exercises.splice(i, 0, snapshot)) });
-              }}
-            >
-              <Icon name="trash" /> Quitar de la sesión
-            </button>
-          </div>
+        <ExerciseMenuSheet
+          session={session}
+          index={exMenu}
+          exercise={exMap.get(session.exercises[exMenu].exerciseId)}
+          settings={settings}
+          onClose={() => setExMenu(null)}
+          onWarmup={() => {
+            void addSet(session.id, exMenu, true);
+            setExMenu(null);
+          }}
+          onNote={() => {
+            setNoteFor(session.exercises[exMenu].exerciseId);
+            setExMenu(null);
+          }}
+          onHistory={() => {
+            setHistoryFor(exMenu);
+            setExMenu(null);
+          }}
+          onReplace={() => {
+            setPicker({ replace: exMenu });
+            setExMenu(null);
+          }}
+          onMove={(to) => {
+            void moveExercise(session.id, exMenu, to);
+            setExMenu(null);
+          }}
+          onRemove={async () => {
+            const i = exMenu;
+            const snapshot = structuredClone(session.exercises[i]);
+            const name = exMap.get(snapshot.exerciseId)?.name;
+            setExMenu(null);
+            const ok = await confirm({
+              title: `¿Quitar ${name} de la sesión?`,
+              body: snapshot.sets.some((x) => x.done) ? 'Tiene series registradas; se quitarán también.' : undefined,
+              confirmLabel: 'Quitar',
+              danger: true,
+            });
+            if (!ok) return;
+            await removeExercise(session.id, i);
+            toast({ message: 'Ejercicio quitado', onAction: () => mutate(session.id, (s) => void s.exercises.splice(i, 0, snapshot)) });
+          }}
+        />
+      )}
+
+      {noteFor && exMap.get(noteFor) && <ExerciseNoteSheet exercise={exMap.get(noteFor)!} onClose={() => setNoteFor(null)} />}
+
+      {historyFor != null && session.exercises[historyFor] && (
+        <Sheet title={exMap.get(session.exercises[historyFor].exerciseId)?.name ?? 'Ejercicio'} eyebrow="Historial y récords" onClose={() => setHistoryFor(null)}>
+          <HistoryBlock
+            logs={history.by.get(session.exercises[historyFor].exerciseId) ?? []}
+            records={history.recs.get(session.exercises[historyFor].exerciseId)}
+            unit={settings.unit}
+            advanced={showsAdvancedMetrics(settings)}
+          />
         </Sheet>
       )}
 
@@ -489,28 +461,36 @@ function ActiveSession({ session }: { session: Session }) {
   );
 }
 
-function SessionHeader({ session, onFinish }: { session: Session; onFinish: () => void }) {
+function SessionHeader({ session, done, total, onFinish }: { session: Session; done: number; total: number; onFinish: () => void }) {
   const now = useNow(1000);
+  const pct = total ? (done / total) * 100 : 0;
   return (
     <header className="sess__head">
-      <Link to="/" className="btn btn--ghost btn--icon" aria-label="Salir a Hoy (la sesión sigue abierta)">
-        <Icon name="left" />
-      </Link>
-      <div className="sess__title">
-        <span className="eyebrow">{session.dayName}</span>
-        <span className="mono sess__elapsed" aria-label={`Tiempo transcurrido ${fmtClock((now - session.startedAt) / 1000)}`}>
-          {fmtClock((now - session.startedAt) / 1000)}
+      <div className="sess__bar">
+        <Link to="/" className="btn btn--ghost btn--icon" aria-label="Salir a Hoy (la sesión sigue abierta)">
+          <Icon name="left" />
+        </Link>
+        <div className="sess__title">
+          <span className="sess__day">{session.dayName}</span>
+          <span className="mono sess__elapsed" aria-label={`Tiempo transcurrido ${fmtClock((now - session.startedAt) / 1000)}`}>
+            {fmtClock((now - session.startedAt) / 1000)}
+          </span>
+        </div>
+        <button className="btn btn--text sess__finish" onClick={onFinish}>
+          Terminar
+        </button>
+      </div>
+      <div className="sess__progress">
+        <div className="sess__track" role="progressbar" aria-valuemin={0} aria-valuemax={total} aria-valuenow={done} aria-label="Series registradas">
+          <span style={{ width: `${pct}%` }} />
+        </div>
+        <span className="sess__count tnum">
+          {done} de {total} series
         </span>
       </div>
-      <button className="btn btn--sm btn--primary" onClick={onFinish}>
-        Terminar
-      </button>
     </header>
   );
 }
-
-
-
 
 const KIND_LABEL: Record<Suggestion['kind'], string> = {
   subir: 'Sube peso',
@@ -530,15 +510,19 @@ interface PanelProps {
   onToggle: (setIdx: number) => void;
   onPatch: (setIdx: number, patch: Partial<SetEntry>) => void;
   onSetMenu: (setIdx: number) => void;
-  onExMenu: () => void;
-  onAddSet: (warmup: boolean) => void;
+  onAddSet: () => void;
 }
 
-function ExercisePanel({ session, index, ex, exercise, logs, records, settings, onToggle, onPatch, onSetMenu, onExMenu, onAddSet }: PanelProps) {
+/** Etiquetas de serie: 1, 2, 3… para las efectivas y C1, C2… para los calentamientos. */
+function setLabels(sets: SetEntry[]) {
+  let work = 0;
+  let warm = 0;
+  return sets.map((s) => (s.isWarmup ? `C${++warm}` : String(++work)));
+}
+
+function useSuggestion(ex: SessionExercise, exercise: Exercise | undefined, logs: ExerciseLog[], settings: Settings) {
   const unit = settings.unit;
-  const advanced = showsEffort(settings);
-  const last = logs[0];
-  const sug = useMemo(
+  return useMemo(
     () =>
       exercise
         ? suggest({
@@ -554,6 +538,13 @@ function ExercisePanel({ session, index, ex, exercise, logs, records, settings, 
         : null,
     [logs, exercise, ex.repMin, ex.repMax, ex.targetSets, settings.incrementUpperKg, settings.incrementLowerKg, unit],
   );
+}
+
+function ExercisePanel({ session, index, ex, exercise, logs, records, settings, onToggle, onPatch, onSetMenu, onAddSet }: PanelProps) {
+  const unit = settings.unit;
+  const advanced = showsEffort(settings);
+  const last = logs[0];
+  const sug = useSuggestion(ex, exercise, logs, settings);
   const pendingWork = ex.sets.filter((s) => !s.done && !s.isWarmup);
   const applied = !!sug && pendingWork.length > 0 && pendingWork.every((s) => s.weightKg === sug.weightKg && s.reps === sug.reps);
   const firstPending = ex.sets.findIndex((s) => !s.done);
@@ -565,129 +556,145 @@ function ExercisePanel({ session, index, ex, exercise, logs, records, settings, 
       ? setPRs(records, doneWorkSetsBefore(session, ex.exerciseId, { ex: index, set: j }), { w: s.weightKg, r: s.reps })
       : [],
   );
+  const labels = setLabels(ex.sets);
 
-  let work = 0;
-  let warm = 0;
-  const labels = ex.sets.map((s) => (s.isWarmup ? `C${++warm}` : String(++work)));
-  const [editingNote, setEditingNote] = useState(false);
+  // "La vez pasada" para la serie activa: la misma serie efectiva de la última sesión.
+  const activeSet = ex.sets[firstPending];
+  let hint: string | undefined;
+  if (activeSet && !activeSet.isWarmup) {
+    const n = Number(labels[firstPending]) - 1;
+    const prev = last?.workSets[n];
+    if (prev) hint = `la vez pasada ${fmtWeight(prev.w, unit)} × ${prev.r}`;
+    else if (!last) hint = 'primera vez';
+  }
+
+  const pill =
+    sug && pendingWork.length > 0 && activeSet && !activeSet.isWarmup ? (
+      <div className="sugpill">
+        <button
+          className="sugpill__btn"
+          disabled={applied}
+          aria-pressed={applied}
+          title={sug.reason}
+          onClick={() => applyToPending(session.id, index, sug.weightKg, sug.reps)}
+          aria-label={
+            applied
+              ? `Sugerencia aplicada: ${fmtWeight(sug.weightKg, unit)} ${unit} por ${sug.reps} reps`
+              : `Aplicar sugerencia (${KIND_LABEL[sug.kind]}): ${sug.reason} ${fmtWeight(sug.weightKg, unit)} ${unit} por ${sug.reps} reps en las series pendientes`
+          }
+        >
+          {applied && <Icon name="check" size={16} stroke={2.5} />}
+          Sugerido · <span className="mono">{fmtWeight(sug.weightKg, unit)} × {sug.reps}</span>
+        </button>
+        <Help term="sugerencia" />
+      </div>
+    ) : null;
+
+  return (
+    <div className="panel">
+      {members.length > 1 && (
+        <p className="panel__ss">
+          Superset {members.indexOf(index) + 1} de {members.length} · sin descanso entre ejercicios del grupo
+        </p>
+      )}
+      {exercise?.note && <p className="panel__note">{exercise.note}</p>}
+
+      <ol className="sets" data-advanced={advanced || undefined}>
+        {ex.sets.map((s, j) => (
+          <SetRow
+            key={s.id}
+            set={s}
+            label={labels[j]}
+            unit={unit}
+            advanced={advanced}
+            active={j === firstPending}
+            prs={prsBySet[j]}
+            hint={j === firstPending ? hint : undefined}
+            footer={j === firstPending ? pill : undefined}
+            onPatch={(patch) => onPatch(j, patch)}
+            onToggle={() => onToggle(j)}
+            onMenu={() => onSetMenu(j)}
+          />
+        ))}
+      </ol>
+
+      <button className="btn btn--text panel__add" onClick={onAddSet}>
+        <Icon name="plus" size={18} /> Agregar serie
+      </button>
+    </div>
+  );
+}
+
+/** Hoja "···" del ejercicio: lo ocasional (calentamiento, nota, discos, cambiar) fuera de la vista principal. */
+function ExerciseMenuSheet({
+  session,
+  index,
+  exercise,
+  settings,
+  onClose,
+  onWarmup,
+  onNote,
+  onHistory,
+  onReplace,
+  onMove,
+  onRemove,
+}: {
+  session: Session;
+  index: number;
+  exercise?: Exercise;
+  settings: Settings;
+  onClose: () => void;
+  onWarmup: () => void;
+  onNote: () => void;
+  onHistory: () => void;
+  onReplace: () => void;
+  onMove: (to: number) => void;
+  onRemove: () => void;
+}) {
+  const ex = session.exercises[index];
+  const unit = settings.unit;
+  const labels = setLabels(ex.sets);
+  const firstPending = ex.sets.findIndex((s) => !s.done);
   const plateSetIdx = firstPending !== -1 ? firstPending : ex.sets.length - 1;
   const plateSet = ex.sets[plateSetIdx];
   const plates =
     exercise?.equipment === 'barra' && plateSet?.weightKg != null
       ? { weightKg: plateSet.weightKg, barKg: barKgFor(settings.barKg, unit), label: `${plateSet.isWarmup ? 'calentamiento' : 'serie'} ${labels[plateSetIdx]}` }
       : null;
-
   return (
-    <div className="panel">
-      <div className="panel__meta">
-        <Meta
-          parts={[
-            `${String(index + 1).padStart(2, '0')} / ${String(session.exercises.length).padStart(2, '0')}`,
-            exercise && MUSCLE_LABEL[exercise.primaryMuscle],
-            exercise && EQUIPMENT_LABEL[exercise.equipment],
-          ]}
-        />
-        <button className="btn btn--ghost btn--icon" onClick={onExMenu} aria-label="Opciones del ejercicio">
-          <Icon name="more" />
-        </button>
-      </div>
-      {members.length > 1 && (
-        <p className="panel__ss">
-          <span className="tag">Superset</span> {members.indexOf(index) + 1} de {members.length} · sin descanso entre ejercicios del grupo
-        </p>
-      )}
-      <p className="panel__target mono">
-        {ex.targetSets ? `${ex.targetSets} × ${ex.repMin}–${ex.repMax}` : 'Sin objetivo'} · descanso {fmtClock(ex.restSec)}
-      </p>
-      {exercise?.note && (
-        <button className="exnote" onClick={() => setEditingNote(true)} aria-label={`Nota de ${exercise.name}: ${exercise.note}. Toca para editar`}>
-          <Icon name="edit" size={16} />
-          <span>{exercise.note}</span>
-        </button>
-      )}
-
-      <div className="panel__last">
-        <span className="eyebrow">{last ? `Última vez · ${fmtRelativeDay(last.date)}` : 'Primera vez'}</span>
-        {last ? (
-          <span className="panel__lastsets mono">
-            {last.workSets.map((s, i) => (
-              <span key={i}>
-                {fmtWeight(s.w, unit)}×{s.r}
-              </span>
-            ))}
-          </span>
-        ) : (
-          <span className="small muted">Elige un peso con el que llegues a {ex.repMin ?? 8} reps con buena técnica.</span>
-        )}
-      </div>
-
-      {sug && pendingWork.length > 0 && (
-        <div className="sug" data-kind={sug.kind}>
-          <div className="sug__text">
-            <span className="eyebrow eyebrow--ink">Sugerencia · {KIND_LABEL[sug.kind]} <Help term="sugerencia" /></span>
-            <span className="small">{sug.reason}</span>
-          </div>
-          <button
-            className="btn btn--sm"
-            disabled={applied}
-            onClick={() => applyToPending(session.id, index, sug.weightKg, sug.reps)}
-            aria-label={`Aplicar sugerencia: ${fmtWeight(sug.weightKg, unit)} ${unit} por ${sug.reps} reps en las series pendientes`}
-          >
-            {applied ? (
-              'Aplicada'
-            ) : (
-              <span className="mono">
-                {fmtWeight(sug.weightKg, unit)}×{sug.reps}
-              </span>
-            )}
+    <Sheet title={exercise?.name ?? 'Ejercicio'} eyebrow={`Ejercicio ${index + 1} de ${session.exercises.length}`} onClose={onClose}>
+      <div className="stack" style={{ '--gap': '16px' } as React.CSSProperties}>
+        {plates && <PlatesLine {...plates} unit={unit} />}
+        <div className="menu">
+          <button onClick={onWarmup}>
+            <Icon name="plus" /> Agregar calentamiento
+          </button>
+          {exercise && (
+            <button onClick={onNote}>
+              <Icon name="edit" /> {exercise.note ? 'Editar nota del ejercicio' : 'Nota del ejercicio'}
+            </button>
+          )}
+          <button onClick={onHistory}>
+            <Icon name="list" /> Historial y récords
+          </button>
+          <button onClick={onReplace}>
+            <Icon name="swap" /> Cambiar por otro de {MUSCLE_LABEL[exercise?.primaryMuscle ?? 'pecho'].toLowerCase()}
+          </button>
+          <button disabled={index === 0} onClick={() => onMove(index - 1)}>
+            <Icon name="up" /> Mover antes
+          </button>
+          <button disabled={index === session.exercises.length - 1} onClick={() => onMove(index + 1)}>
+            <Icon name="down" /> Mover después
+          </button>
+          <Link to={`/progreso/${ex.exerciseId}`}>
+            <Icon name="arrow" /> Ver progreso (la sesión sigue abierta)
+          </Link>
+          <button className="menu__danger" onClick={onRemove}>
+            <Icon name="trash" /> Quitar de la sesión
           </button>
         </div>
-      )}
-
-      <div className="sets" data-advanced={advanced || undefined}>
-        <div className="sets__head" aria-hidden="true">
-          <span>Serie</span>
-          <span>Peso {unit}</span>
-          <span>Reps</span>
-          {advanced && <span>RIR</span>}
-          <span />
-        </div>
-        <ol>
-          {ex.sets.map((s, j) => (
-            <SetRow
-              key={s.id}
-              set={s}
-              label={labels[j]}
-              unit={unit}
-              advanced={advanced}
-              active={j === firstPending}
-              prs={prsBySet[j]}
-              onPatch={(patch) => onPatch(j, patch)}
-              onToggle={() => onToggle(j)}
-              onMenu={() => onSetMenu(j)}
-            />
-          ))}
-        </ol>
       </div>
-
-      {plates && <PlatesLine {...plates} unit={unit} />}
-
-      <div className="panel__tools">
-        <button className="btn btn--sm" onClick={() => onAddSet(false)}>
-          <Icon name="plus" size={16} /> Serie
-        </button>
-        <button className="btn btn--sm btn--ghost" onClick={() => onAddSet(true)}>
-          <Icon name="plus" size={16} /> Calentamiento
-        </button>
-        <Help term="calentamiento" />
-        {exercise && !exercise.note && (
-          <button className="btn btn--sm btn--ghost" onClick={() => setEditingNote(true)}>
-            <Icon name="edit" size={16} /> Nota
-          </button>
-        )}
-      </div>
-      {editingNote && exercise && <ExerciseNoteSheet exercise={exercise} onClose={() => setEditingNote(false)} />}
-    </div>
+    </Sheet>
   );
 }
 
@@ -808,23 +815,6 @@ function HistoryBlock({ logs, records, unit, advanced }: { logs: ExerciseLog[]; 
           </li>
         ))}
       </ol>
-    </section>
-  );
-}
-
-function NotesBlock({ session }: { session: Session }) {
-  return (
-    <section className="side-block">
-      <label className="section-head" htmlFor="sess-notes">
-        <span className="eyebrow eyebrow--ink">Notas de la sesión</span>
-      </label>
-      <textarea
-        id="sess-notes"
-        className="textarea"
-        defaultValue={session.notes}
-        placeholder="Cómo te sentiste, ajustes de máquina, molestias…"
-        onBlur={(e) => e.target.value !== (session.notes ?? '') && setNotes(session.id, e.target.value)}
-      />
     </section>
   );
 }

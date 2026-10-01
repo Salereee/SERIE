@@ -47,7 +47,7 @@ const hero = (t, th) => `${base(t, 1200, 540)}
 <div style="position:absolute;left:64px;top:56px;width:640px">
   <div class="brand"><i></i>SERIE</div>
   <div style="display:flex;justify-content:space-between;margin-top:54px;padding-bottom:12px;border-bottom:2px solid ${t.ink}">
-    <span class="eyebrow ink">Registro de entrenamiento</span><span class="eyebrow">N.º 01 · v1.0</span>
+    <span class="eyebrow ink">Registro de entrenamiento</span><span class="eyebrow">N.º 01 · v1.2</span>
   </div>
   <h1 style="font-size:92px;line-height:.92;letter-spacing:-.045em;font-weight:700;margin-top:30px">Cada serie,<br>anotada<span class="dot">.</span></h1>
   <div class="ruler" style="margin-top:28px;width:560px"></div>
@@ -60,7 +60,7 @@ const SCREENS = [
   ['01', 'hoy', 'Hoy', 'Qué día toca y con qué ejercicios.'],
   ['02', 'sesion', 'Sesión', 'Peso y reps prellenados; un toque registra.'],
   ['03', 'ejercicio', 'Por ejercicio', 'Récords, gráfica y sugerencia de peso.'],
-  ['04', 'progreso', 'Progreso', 'Sesiones, volumen y constancia.'],
+  ['04', 'progreso', 'Progreso', 'Sesiones, racha y récords recientes.'],
 ];
 const screens = (t, th) => `${base(t, 1200, 720)}
 <div style="position:absolute;left:56px;right:56px;top:40px;display:flex;justify-content:space-between;padding-bottom:14px;border-bottom:2px solid ${t.ink}">
@@ -125,7 +125,8 @@ jobs.push(['social-preview', social(THEMES.oscuro), 1280, 640]);
 const browser = await puppeteer.launch({
   executablePath: process.env.CHROME ?? 'C:/Program Files/Google/Chrome/Application/chrome.exe',
   headless: true,
-  args: ['--allow-file-access-from-files'],
+  // CHROME_ARGS: banderas extra (p. ej. --no-sandbox en contenedores que corren como root).
+  args: ['--allow-file-access-from-files', ...(process.env.CHROME_ARGS?.split(' ').filter(Boolean) ?? [])],
 });
 const page = await browser.newPage();
 for (const [name, html, w, h] of jobs) {

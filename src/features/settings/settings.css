@@ -1,18 +1,18 @@
-/* ——— Ajustes: más aire entre opciones, texto y controles bien separados ——— */
+/* ——— Ajustes: grupos en tarjetas, filas separadas por espacio ——— */
 
 .settings {
-  gap: 32px;
+  gap: 24px;
+  max-width: 1040px;
 }
 
 .srow {
   display: grid;
   gap: 14px;
-  padding: 20px 0 22px;
-  border-top: var(--b1);
+  padding: 18px 0;
 }
 .srow__text {
   display: grid;
-  gap: 6px;
+  gap: 4px;
 }
 .srow__text p {
   max-width: 58ch;
@@ -36,93 +36,91 @@
   gap: 12px 20px;
 }
 
-/* Rápidos: Modo, Unidad y Tema siempre visibles. */
+/* Rápidos: Modo, Unidad y Tema siempre visibles, en una tarjeta. */
 .settings__quick {
   display: grid;
-  border-top: var(--b2);
+  padding: 2px 20px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
 }
-.settings__quick > .srow:first-child {
-  border-top: 0;
+.settings__quick .seg {
+  background: var(--fill);
 }
 @media (min-width: 900px) {
   .settings__quick {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    column-gap: 40px;
+    column-gap: 32px;
   }
   .settings__quick > .srow {
-    border-top: 0;
     align-content: space-between;
   }
 }
 
-/* Grupos desplegables: una columna en celular, dos en escritorio. */
+/* Grupos desplegables: cada uno es una tarjeta. Una columna en celular, dos en escritorio. */
 .settings__groups {
   display: grid;
-  gap: 0;
+  gap: 8px;
 }
 .settings__col {
   display: grid;
+  gap: 8px;
   align-content: start;
 }
 @media (min-width: 900px) {
   .settings__groups {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 48px;
+    column-gap: 16px;
   }
 }
-/* Dentro de un grupo, la primera opción no repite la regla del encabezado. */
-.settings .disc__inner > .srow:first-child {
-  border-top: 0;
-  padding-top: 8px;
+.settings .disc--section {
+  padding: 4px 20px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
 }
-.settings .disc {
-  margin-bottom: 8px;
+.settings .disc--section > .disc__head {
+  background: transparent;
+}
+.settings .disc--section > .disc__head .disc__btn {
+  min-height: 56px;
+}
+.settings .disc__inner > .srow:first-child {
+  padding-top: 4px;
 }
 
+/* Interruptor: píldora con perilla. */
 .toggle {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  min-height: 44px;
+  gap: 12px;
+  min-height: var(--tap);
   padding: 0 4px 0 0;
   font-weight: 600;
 }
 .toggle__box {
-  width: 40px;
-  height: 24px;
-  border: var(--b2);
+  width: 44px;
+  height: 26px;
+  border-radius: 13px;
+  background: var(--fill);
+  box-shadow: inset 0 0 0 1px var(--muted);
   position: relative;
+  transition: background-color var(--t-fast) ease;
 }
 .toggle__box::after {
   content: '';
   position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 16px;
-  height: 16px;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
   background: var(--ink);
   transition: transform 140ms var(--ease);
 }
 .toggle[aria-checked='true'] .toggle__box {
   background: var(--ink);
+  box-shadow: none;
 }
 .toggle[aria-checked='true'] .toggle__box::after {
   background: var(--bg);
-  transform: translateX(16px);
-}
-
-.more-list a {
-  display: grid;
-  grid-template-columns: 32px 1fr auto;
-  align-items: center;
-  gap: 8px;
-  min-height: 64px;
-  text-decoration: none;
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  border-bottom: var(--b1);
-}
-.more-list a:hover {
-  background: var(--fill);
+  transform: translateX(18px);
 }

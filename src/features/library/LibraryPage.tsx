@@ -9,10 +9,10 @@ import { computeRecords } from '../../domain/records';
 import { fmtWeight } from '../../domain/units';
 import { useFeedback } from '../../ui/feedback';
 import { Icon } from '../../ui/Icon';
-import { Meta } from '../../ui/Meta';
 import { Sheet } from '../../ui/Sheet';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { ExerciseBrowser } from './ExerciseBrowser';
+import { RUTINAS_NAV, SegNav } from '../../ui/SegNav';
 import { ExerciseForm } from './ExerciseForm';
 
 export function LibraryPage() {
@@ -27,14 +27,17 @@ export function LibraryPage() {
   return (
     <div className="page">
       <header className="page-head">
-        <Meta parts={[`${count} ejercicios`, `${customCount} propios`]} />
-        <div className="page-head__row">
-          <h1 className="title-lg">Biblioteca</h1>
-          <button className="btn btn--primary" onClick={() => setEditing('new')}>
-            <Icon name="plus" /> Crear ejercicio
-          </button>
-        </div>
+        <h1 className="title-xl">Rutinas</h1>
+        <SegNav items={RUTINAS_NAV} label="Rutinas" />
       </header>
+      <div className="section-tools">
+        <span className="eyebrow">
+          {count} ejercicios · {customCount} propios
+        </span>
+        <button className="btn btn--sm" onClick={() => setEditing('new')}>
+          <Icon name="plus" size={18} /> Crear ejercicio
+        </button>
+      </div>
 
       <div className="grid12">
         <div className="span-7">

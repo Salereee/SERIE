@@ -30,15 +30,15 @@ export function DaysTable({ days, compact, wide, extra }: { days: ProgramDay[]; 
       {days.map((d, i) => (
         <section key={d.id} className="days-table__day" aria-label={d.name}>
           <header className="days-table__head">
-            <span className="mono small">{String(i + 1).padStart(2, '0')}</span>
             <span className="title-sm">{d.name}</span>
+            <span className="eyebrow tnum">Día {i + 1}</span>
           </header>
           <ol>
             {d.items.map((it) => (
               <li key={it.id} className="days-table__item">
                 <span>{ex.get(it.exerciseId)?.name ?? it.exerciseId}</span>
-                <span className="mono small muted">
-                  {it.targetSets}×{it.repMin}–{it.repMax}
+                <span className="tnum muted days-table__rx">
+                  {it.targetSets} × {it.repMin}–{it.repMax}
                   {!compact && <> · {fmtClock(it.restSec)}</>}
                 </span>
               </li>

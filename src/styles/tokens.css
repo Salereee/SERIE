@@ -17,16 +17,35 @@
   --danger: #a3160c;
   --focus: #0e0e0d; /* foco: tinta sólida, acorde a la grilla */
 
-  --b1: 1px solid var(--line);
-  --b2: 2px solid var(--line);
+  /* Separadores: siempre suaves. Agrupar es trabajo de superficies y aire, no de reglas en tinta. */
+  --b1: 1px solid var(--line-soft);
+  --b2: 1px solid var(--line-soft);
   --bs: 1px solid var(--line-soft);
+  /* Borde de controles editables: --muted pasa 3:1 contra el fondo en ambos temas. */
+  --b-field: 1px solid var(--muted);
 
-  --radius: 2px;
-  --gutter: 16px;
+  --radius-sm: 8px; /* chips pequeños */
+  --radius: 12px; /* botones, inputs */
+  --radius-lg: 20px; /* tarjetas */
+  --radius-sheet: 24px; /* esquinas superiores de hojas */
+  --radius-pill: 999px;
+
+  /* Escala de espacio: 4, 8, 12, 16, 20, 24, 32, 40, 48. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
+  --gutter: 20px;
+  --block-gap: var(--space-8); /* entre bloques de una página */
   --tap: 48px;
   --tap-lg: 56px;
-  --nav-h: 60px;
-  --timer-h: 64px;
+  --nav-h: 64px;
+  --timer-h: 96px;
   --sidebar-w: 232px;
 
   /* Movimiento: curvas fuertes; nada de ease-in en UI. */
@@ -38,7 +57,7 @@
   --t-base: 240ms;
   --t-slow: 420ms; /* solo momentos raros: resumen, primera vez */
 
-  /* Regla graduada: marca de identidad (como la cinta de una barra olímpica). */
+  /* Regla graduada: marca de identidad (como la cinta de una barra olímpica). Solo en la bienvenida. */
   --ruler: repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 8px),
     repeating-linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 40px);
   color-scheme: light;

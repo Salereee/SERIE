@@ -1,7 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useRef } from 'react';
-import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { useActiveSession, useSettings } from './db/hooks';
-import { fmtDateLong } from './domain/format';
 import { LibraryPage } from './features/library/LibraryPage';
 import { OnboardingPage } from './features/onboarding/OnboardingPage';
 import { ImportProgramPage } from './features/programs/ImportProgramPage';
@@ -10,7 +9,6 @@ import { ProgramsPage } from './features/programs/ProgramsPage';
 import { LiveBar } from './features/session/LiveBar';
 import { SessionPage } from './features/session/SessionPage';
 import { SummaryPage } from './features/session/SummaryPage';
-import { MorePage } from './features/settings/MorePage';
 import { SettingsPage } from './features/settings/SettingsPage';
 import { TodayPage } from './features/today/TodayPage';
 import { useDbOutdated, useStorageErrorToasts } from './db/storageErrors';
@@ -18,20 +16,22 @@ import { InstallGuideOnce } from './pwa/InstallGuide';
 import { UpdatePrompt } from './pwa/UpdatePrompt';
 import { ErrorBoundary } from './ui/ErrorBoundary';
 import { useFeedback } from './ui/feedback';
+import { Icon, type IconName } from './ui/Icon';
 
 // Pantallas de consulta (gráficas, historial largo): se cargan al entrar, no al abrir la app.
 const HistoryPage = lazy(() => import('./features/history/HistoryPage').then((m) => ({ default: m.HistoryPage })));
 const ProgressPage = lazy(() => import('./features/progress/ProgressPage').then((m) => ({ default: m.ProgressPage })));
 const ExerciseProgressPage = lazy(() => import('./features/progress/ExerciseProgressPage').then((m) => ({ default: m.ExerciseProgressPage })));
 
-const NAV = [
-  { to: '/', label: 'Hoy', end: true },
-  { to: '/programas', label: 'Programas' },
-  { to: '/historial', label: 'Historial' },
-  { to: '/progreso', label: 'Progreso' },
-  { to: '/biblioteca', label: 'Biblioteca' },
-  { to: '/ajustes', label: 'Ajustes' },
+/** Tres secciones: planear (Rutinas), entrenar (Hoy) y revisar (Progreso). Ajustes vive en el engrane de Hoy. */
+const TABS: { to: string; label: string; icon: IconName; match: string[] }[] = [
+  { to: '/', label: 'Hoy', icon: 'home', match: [] },
+  { to: '/programas', label: 'Rutinas', icon: 'dumbbell', match: ['/programas', '/biblioteca', '/importar'] },
+  { to: '/progreso', label: 'Progreso', icon: 'chart', match: ['/progreso', '/historial'] },
 ];
+const SIDEBAR = [...TABS, { to: '/ajustes', label: 'Ajustes', icon: 'gear' as IconName, match: ['/ajustes'] }];
+
+const isCurrent = (path: string, t: (typeof SIDEBAR)[number]) => (t.to === '/' ? path === '/' : t.match.some((m) => path.startsWith(m)));
 
 function useTheme() {
   const { theme } = useSettings();
@@ -83,17 +83,16 @@ export function App() {
             <span className="brand__mark" aria-hidden="true" />
             SERIE
           </Link>
-          <div className="ruler" aria-hidden="true" />
           <nav>
-            {NAV.map((n, i) => (
-              <NavLink key={n.to} to={n.to} end={n.end}>
-                <span className="mono">{String(i + 1).padStart(2, '0')}</span>
+            {SIDEBAR.map((n) => (
+              <Link key={n.to} to={n.to} aria-current={isCurrent(location.pathname, n) ? 'page' : undefined}>
+                <Icon name={n.icon} size={22} />
                 {n.label}
-              </NavLink>
+              </Link>
             ))}
           </nav>
           <div className="sidebar__foot">
-            <span className="eyebrow">Modo {settings.mode === 'basico' ? 'básico' : 'avanzado'}</span>
+            <span className="small muted">Modo {settings.mode === 'basico' ? 'básico' : 'avanzado'}</span>
             <span className="small muted">Datos guardados solo en este navegador.</span>
           </div>
         </aside>
@@ -105,11 +104,12 @@ export function App() {
               <span className="brand__mark" aria-hidden="true" />
               SERIE
             </Link>
-            <span className="eyebrow">{fmtDateLong(Date.now())}</span>
+            {location.pathname === '/' && (
+              <Link to="/ajustes" className="btn btn--ghost btn--icon topbar__gear" aria-label="Ajustes">
+                <Icon name="gear" size={24} />
+              </Link>
+            )}
           </header>
-        )}
-        {showNav && (
-          <div className="ruler topbar__ruler mobile-only" aria-hidden="true" />
         )}
         {/* Cambiar de sección vuelve a montar la pantalla y dispara su entrada. */}
         {outdated && (
@@ -144,7 +144,7 @@ export function App() {
           <Route path="/progreso/:exerciseId" element={<ExerciseProgressPage />} />
           <Route path="/biblioteca" element={<LibraryPage />} />
           <Route path="/ajustes" element={<SettingsPage />} />
-          <Route path="/mas" element={<MorePage />} />
+          <Route path="/mas" element={<Navigate to="/ajustes" replace />} />
           <Route path="/importar" element={<ImportProgramPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
@@ -157,17 +157,12 @@ export function App() {
       {showNav && active && <LiveBar session={active} />}
       {showNav && (
         <nav className="tabbar" aria-label="Navegación principal">
-          <NavLink to="/" end>
-            Hoy
-          </NavLink>
-          <NavLink to="/programas">Programas</NavLink>
-          <NavLink to="/progreso">Progreso</NavLink>
-          <NavLink
-            to="/mas"
-            aria-current={['/mas', '/historial', '/biblioteca', '/ajustes'].some((p) => location.pathname.startsWith(p)) ? 'page' : undefined}
-          >
-            Más
-          </NavLink>
+          {TABS.map((t) => (
+            <Link key={t.to} to={t.to} aria-current={isCurrent(location.pathname, t) ? 'page' : undefined}>
+              <Icon name={t.icon} size={24} />
+              {t.label}
+            </Link>
+          ))}
         </nav>
       )}
     </div>

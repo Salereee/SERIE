@@ -9,10 +9,10 @@ import { fmtVolume, fmtWeight } from '../../domain/units';
 import { CountUp } from '../../ui/CountUp';
 import { Meta } from '../../ui/Meta';
 import { Icon } from '../../ui/Icon';
-import { PRRow } from '../today/TodayPage';
-import '../today/today.css';
+import { PRRow } from '../../ui/PRRow';
 import './summary.css';
 import { Help } from '../../ui/Help';
+import { setNotes } from './actions';
 
 export function SummaryPage() {
   const { id } = useParams();
@@ -101,7 +101,7 @@ export function SessionReport({ session, headline }: { session: Session; headlin
             <h2 id="ej-title" className="eyebrow eyebrow--ink">
               Ejercicios
             </h2>
-            <span className="eyebrow mono">{session.exercises.length}</span>
+            <span>{session.exercises.length}</span>
           </div>
           <table className="report__table">
             <thead>
@@ -139,15 +139,30 @@ export function SessionReport({ session, headline }: { session: Session; headlin
         </section>
       </div>
 
-      {session.notes && (
-        <section>
-          <div className="section-head">
-            <span className="eyebrow eyebrow--ink">Notas</span>
-          </div>
-          <p className="lead" style={{ whiteSpace: 'pre-wrap' }}>
-            {session.notes}
-          </p>
+      {headline ? (
+        <section className="field">
+          <label className="section-head" htmlFor="sess-notes">
+            <span className="eyebrow eyebrow--ink">Notas de la sesión</span>
+          </label>
+          <textarea
+            id="sess-notes"
+            className="textarea"
+            defaultValue={session.notes}
+            placeholder="Cómo te sentiste, ajustes de máquina, molestias…"
+            onBlur={(e) => e.target.value !== (session.notes ?? '') && setNotes(session.id, e.target.value)}
+          />
         </section>
+      ) : (
+        session.notes && (
+          <section>
+            <div className="section-head">
+              <span className="eyebrow eyebrow--ink">Notas de la sesión</span>
+            </div>
+            <p className="lead" style={{ whiteSpace: 'pre-wrap' }}>
+              {session.notes}
+            </p>
+          </section>
+        )
       )}
     </div>
   );

@@ -2,6 +2,42 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/); versiones con [SemVer](https://semver.org/lang/es/). La versión actual se ve en **Ajustes**.
 
+## [1.2.0] — 2026-10-01
+
+Rediseño minimal: mismos colores, menos ruido. Cada pantalla responde una sola pregunta (Hoy: ¿qué entreno?, Sesión: ¿cuánto levanté?, Progreso: ¿estoy avanzando?). Los datos guardados y los respaldos siguen siendo compatibles: el cambio es solo de interfaz.
+
+### Sesión
+- La serie que sigue va en una tarjeta con “la vez pasada” de esa misma serie, campos con sufijo kg/reps y ✓ de 56 px. La primera serie queda en el tercio superior de la pantalla.
+- Las series hechas se encogen a una línea (“62.5 kg × 9 ✓”); tocarla la abre para editar.
+- La sugerencia es una píldora de un toque (“Sugerido · 62.5 × 9”); la explicación vive en el “?” y en el lector de pantalla.
+- Arriba, el reloj de la sesión y una barra con “2 de 18 series”. El volumen se ve en el resumen.
+- Descanso en una tarjeta compacta con reloj y Saltar; tocar el reloj abre −15 s y +15 s.
+- Calentamiento, nota del ejercicio, discos por lado, historial, cambiar, mover y quitar pasan al menú “···” de cada ejercicio.
+- Las notas de la sesión se escriben en el resumen final (mismo campo de siempre).
+
+### Hoy y navegación
+- Tres pestañas con ícono: Hoy, Rutinas (Programas | Ejercicios) y Progreso (Resumen | Historial). La pestaña Más desaparece; `/mas` lleva a Ajustes y `/biblioteca` y `/historial` siguen funcionando.
+- Ajustes se abre con el engrane de Hoy y desde la barra lateral en escritorio.
+- Hoy: qué toca, la semana en siete puntos, los tres primeros ejercicios y “Empezar” fijo sobre las pestañas. “Cambiar de día” junta Otro día y Sesión libre.
+- Sin fecha ni regla graduada en el encabezado; la regla y el número en contorno quedan solo en la bienvenida.
+
+### Progreso, Historial y Rutinas
+- Progreso: una cifra héroe (sesiones en 30 días), frecuencia y racha, y 12 barras semanales en lugar del mapa de calor. Los récords recientes se mudan aquí desde Hoy; volumen y series por grupo quedan plegados.
+- Progreso por ejercicio: 1RM estimado (o peso máximo en modo básico) como cifra principal y una sola gráfica; la fórmula de Epley pasa a un “?”.
+- Historial: sesiones en tarjetas por mes, con los PR como texto de acento. Se quita “Abrir todo”.
+- Programas en tarjetas con punto de “Activo”; Compartir, Duplicar y Borrar en el menú “···”. Ejercicios con filtros de equipo como chips.
+- Ajustes en tarjetas, con interruptores redondeados.
+
+### Sistema visual
+- Esquinas de 8, 12, 20 y 24 px; escala de espacio de 4 a 48 px y 40 px entre bloques.
+- Superficies y aire en lugar de reglas en tinta. Encabezados y metadatos en sentence case; las mayúsculas quedan para PR y la bienvenida.
+- Títulos de 34 px. JetBrains Mono solo en cifras vivas (peso, reps, relojes, cifras héroe); fechas e índices en Space Grotesk con cifras tabulares.
+- Botón primario de 56 px; secundarios en relleno; campos con borde tenue que pasa 3:1. `check:contrast` cubre las combinaciones nuevas.
+
+### Imágenes
+- Capturas nuevas en el README, la página de presentación, la ventana de instalación y el kit de lanzamiento. Comparativa antes/después en `docs/rediseno/`.
+- `scripts/capturas.mjs` toma todas las capturas con los datos de ejemplo (celular y escritorio, claro y oscuro).
+
 ## [1.1.0] — 2026-09-28
 
 Pasar rutinas y datos entre dispositivos sin cuentas, y licencia MIT.

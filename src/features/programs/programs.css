@@ -2,29 +2,32 @@
 
 .days-table {
   display: grid;
-  border-top: var(--b2);
+  gap: 8px;
 }
+/* Cada día es una tarjeta; sus ejercicios, filas sin bordes. */
 .days-table__day {
-  padding: 12px 0 16px;
-  border-bottom: var(--b1);
+  padding: 16px 20px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
   min-width: 0;
 }
 .days-table__head {
   display: flex;
+  justify-content: space-between;
   gap: 10px;
   align-items: baseline;
-  padding-bottom: 8px;
+  padding-bottom: 6px;
 }
 .days-table__item {
   display: flex;
   justify-content: space-between;
   gap: 12px;
   padding: 6px 0;
-  border-top: var(--bs);
   font-size: 15px;
 }
-.days-table__item > .mono {
+.days-table__rx {
   white-space: nowrap;
+  font-size: 15px;
 }
 .days-table--compact .days-table__item {
   font-size: 14px;
@@ -32,15 +35,7 @@
 }
 @media (min-width: 900px) {
   .days-table--wide {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    border-top: 0;
-    gap: 0;
-    border-left: var(--b1);
-  }
-  .days-table--wide .days-table__day {
-    border-top: var(--b2);
-    border-right: var(--b1);
-    padding: 12px 14px 16px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   }
   .days-table--wide .days-table__item {
     flex-direction: column;
@@ -50,35 +45,60 @@
 
 /* ——— Lista de programas ——— */
 
-.prog-row {
+.prog-cards {
   display: grid;
-  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+.prog-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 12px;
   align-items: center;
-  padding: 14px 0;
+  padding: 16px 16px 16px 20px;
 }
-.prog-row__name {
+.prog-card__link {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+  text-decoration: none;
+  min-width: 0;
+}
+.prog-card__name {
   font-size: 19px;
   font-weight: 700;
   letter-spacing: -0.015em;
-  text-decoration: none;
 }
-.prog-row__name:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+.prog-card .dot-live {
+  margin-top: 4px;
+}
+.prog-card__chev {
+  color: var(--muted);
+}
+/* Toda la tarjeta del programa activo abre su detalle. */
+.prog-card[data-active] {
+  position: relative;
+}
+.prog-card[data-active] .prog-card__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.prog-new {
+  justify-self: start;
 }
 
 .tpl-grid {
   display: grid;
-  border-top: var(--b2);
+  gap: 4px;
 }
 .tpl {
   display: grid;
   grid-template-columns: 56px 1fr auto;
   gap: 12px;
   align-items: center;
-  padding: 12px 0;
-  border-bottom: var(--b1);
+  padding: 12px;
+  border-radius: var(--radius);
   text-align: left;
   width: 100%;
 }
@@ -89,7 +109,8 @@
   font-family: var(--font-mono);
   font-weight: 500;
   font-size: 14px;
-  border: var(--b1);
+  border-radius: 10px;
+  background: var(--fill);
   height: 40px;
   display: grid;
   place-items: center;
@@ -186,6 +207,7 @@
   position: absolute;
   left: 0;
   width: 4px;
+  border-radius: 2px;
   background: var(--ink);
   top: 12px;
   bottom: 0;
@@ -226,7 +248,7 @@
 }
 .bitem__sum {
   grid-area: sum;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
@@ -276,7 +298,7 @@
   gap: 8px;
 }
 .bitem__fields .field__label {
-  font-size: 10px;
+  font-size: 13px;
 }
 .bitem__fields .input,
 .bitem__fields .select {
@@ -312,29 +334,7 @@
   color: var(--ink);
 }
 
-.menu {
-  display: grid;
-  border-top: var(--b2);
-}
-.menu > button,
-.menu > a {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 52px;
-  padding: 0 4px;
-  border-bottom: var(--b1);
-  text-align: left;
-  font-weight: 600;
-  text-decoration: none;
-}
-.menu > button:hover,
-.menu > a:hover {
-  background: var(--fill);
-}
-.menu > button:disabled {
-  opacity: 0.4;
-}
-.menu__danger {
-  color: var(--danger);
+
+.prog__meta {
+  justify-content: space-between;
 }

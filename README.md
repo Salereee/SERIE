@@ -48,10 +48,10 @@ App web para planear splits y registrar entrenamientos: series, peso, reps, desc
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/escritorio-oscuro.png">
   <source media="(prefers-color-scheme: light)" srcset="docs/img/escritorio-claro.png">
-  <img alt="SERIE en computadora: barra lateral, día de hoy, semana y récords recientes" src="docs/img/escritorio-oscuro.png" width="100%">
+  <img alt="SERIE en computadora: barra lateral con Hoy, Rutinas, Progreso y Ajustes, y el día de hoy" src="docs/img/escritorio-oscuro.png" width="100%">
 </picture>
 
-<sub>Capturas reales con los datos de ejemplo de la app (Ajustes → Datos y respaldo). Las imágenes se regeneran con <code>node scripts/readme-visuals.mjs</code>.</sub>
+<sub>Capturas reales con los datos de ejemplo de la app (Ajustes → Datos y respaldo), tomadas con <code>node scripts/capturas.mjs</code>. Las imágenes se regeneran con <code>node scripts/readme-visuals.mjs</code>. Comparativa del rediseño 1.2.0, pantalla por pantalla, en <a href="docs/rediseno/README.md">docs/rediseno</a>.</sub>
 
 ## Requisitos
 

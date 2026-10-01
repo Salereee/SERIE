@@ -140,7 +140,7 @@ export function ExerciseCombobox({ groups: allGroups, query, onQuery, onPick, to
                   aria-label={`Ver los ${g.all} ejercicios de ${g.label}`}
                 >
                   <span>Ver los {g.all}</span>
-                  <span className="mono small muted">+{g.all - g.items.length}</span>
+                  <span className="tnum small muted">+{g.all - g.items.length}</span>
                   <Icon name="down" size={16} className="showmore__chev" />
                 </button>
               )}

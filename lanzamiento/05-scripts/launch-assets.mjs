@@ -179,10 +179,10 @@ const F = resolve(OUT, '03-funcionamiento');
 const FEATS = [
   { shot: 'm-dark-01-bienvenida.png', es: ['Cada serie,', 'anotada.', 'Registro de rutinas de gimnasio. Gratis, sin cuentas.'], en: ['Every set,', 'logged.', 'A gym workout log. Free, no sign-up.'] },
   { shot: 'm-dark-02-hoy.png', es: ['Abres la app', 'y ya sabes qué toca.', 'Tu día, tus ejercicios y tu semana en una pantalla.'], en: ['Open it and', 'know what’s next.', 'Today’s workout, exercises and week on one screen.'] },
-  { shot: 'm-dark-03a-sesion.png', bottom: true, es: ['Una serie,', 'un toque.', 'Peso y reps prellenados con lo de la última vez.'], en: ['One set,', 'one tap.', 'Weight and reps prefilled from last time.'] },
+  { shot: 'm-dark-03a-sesion.png', es: ['Una serie,', 'un toque.', 'Peso y reps prellenados con lo de la última vez.'], en: ['One set,', 'one tap.', 'Weight and reps prefilled from last time.'] },
   { shot: 'm-dark-03-sesion.png', bottom: true, es: ['El descanso', 'se cuenta solo.', 'Timer automático con ±15 s, sonido y aviso visual.'], en: ['Rest timer', 'that runs itself.', 'Auto-start, ±15 s, sound and a visual cue.'] },
   { shot: 'm-dark-06-ejercicio.png', es: ['Mira cómo', 'vas subiendo.', '1RM estimado, peso máximo y récords por ejercicio.'], en: ['Watch yourself', 'get stronger.', 'Estimated 1RM, top weight and PRs per exercise.'] },
-  { shot: 'm-dark-05-progreso.png', es: ['Tu constancia,', 'a la vista.', 'Racha, frecuencia y volumen por grupo muscular.'], en: ['Consistency,', 'made visible.', 'Streaks, frequency and volume per muscle group.'] },
+  { shot: 'm-dark-05-progreso.png', es: ['Tu constancia,', 'a la vista.', 'Sesiones en 30 días, racha y frecuencia semanal.'], en: ['Consistency,', 'made visible.', 'Sessions in 30 days, streak and weekly frequency.'] },
   { shot: 'm-dark-09-programa.png', es: ['Split listo', 'o hecho a mano.', 'PPL, Torso/Pierna, Full Body… o arma el tuyo.'], en: ['Ready-made split', 'or build your own.', 'PPL, Upper/Lower, Full Body… or your own.'] },
   { shot: null, es: ['Sin cuentas.', 'Tus datos, tuyos.', 'Todo se guarda en tu teléfono. Funciona sin internet.'], en: ['No accounts.', 'Your data, yours.', 'Everything stays on your phone. Works offline.'] },
 ];

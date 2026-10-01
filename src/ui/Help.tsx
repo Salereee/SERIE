@@ -16,6 +16,10 @@ export const GLOSSARY = {
     title: 'Sugerencia',
     text: 'Primero sube repeticiones hasta el tope del rango en todas las series; cuando lo logras, la app propone subir el peso (cuánto, lo eliges en Ajustes). Si rindes menos varias sesiones seguidas, sugiere mantener o bajar un poco. Solo es una sugerencia: tú decides si la aplicas.',
   },
+  epley: {
+    title: '1RM estimado',
+    text: 'El peso que podrías levantar una sola vez, calculado con la fórmula de Epley: peso × (1 + reps / 30), con la mejor serie de cada sesión. Sirve para comparar series con distinto peso y reps.',
+  },
   calentamiento: {
     title: 'Calentamiento',
     text: 'Series ligeras antes de las de trabajo. Se ven en gris y no cuentan para volumen ni récords.',
@@ -25,13 +29,14 @@ export const GLOSSARY = {
 export type HelpTerm = keyof typeof GLOSSARY;
 
 /**
- * Botón "?" junto a un término. Solo aparece en modo básico: en avanzado se asume que ya se conocen.
+ * Botón "?" junto a un término. Solo aparece en modo básico (en avanzado se asume que ya se conocen),
+ * salvo con `always`: explicaciones que salieron de la pantalla y solo viven aquí.
  * El área táctil es de 44 px aunque el círculo se vea chico.
  */
-export function Help({ term }: { term: HelpTerm }) {
+export function Help({ term, always }: { term: HelpTerm; always?: boolean }) {
   const { mode } = useSettings();
   const [open, setOpen] = useState(false);
-  if (mode !== 'basico') return null;
+  if (mode !== 'basico' && !always) return null;
   const g = GLOSSARY[term];
   return (
     <>
