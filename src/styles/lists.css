@@ -23,8 +23,8 @@
   margin-top: -8px;
   padding: 0 2px;
   border-top: var(--b1);
-  font-weight: 700;
-  font-size: 14px;
+  font-weight: 600;
+  font-size: 15px;
   text-align: left;
   transition: background-color var(--t-press) ease;
 }

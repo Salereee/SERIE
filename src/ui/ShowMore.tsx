@@ -46,7 +46,7 @@ export function ShowMore<T>({ items, limit = 5, children, noun = 'elementos', cl
           }}
         >
           <span>{open ? 'Ver menos' : `Ver ${noun === 'elementos' ? 'todos' : `los ${items.length} ${noun}`}`}</span>
-          <span className="mono small muted">{open ? '' : `+${hidden}`}</span>
+          <span className="tnum muted">{open ? '' : `+${hidden}`}</span>
           <Icon name="down" size={16} className="showmore__chev" />
         </button>
       )}

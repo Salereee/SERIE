@@ -312,29 +312,3 @@
   color: var(--ink);
 }
 
-.menu {
-  display: grid;
-  border-top: var(--b2);
-}
-.menu > button,
-.menu > a {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 52px;
-  padding: 0 4px;
-  border-bottom: var(--b1);
-  text-align: left;
-  font-weight: 600;
-  text-decoration: none;
-}
-.menu > button:hover,
-.menu > a:hover {
-  background: var(--fill);
-}
-.menu > button:disabled {
-  opacity: 0.4;
-}
-.menu__danger {
-  color: var(--danger);
-}
