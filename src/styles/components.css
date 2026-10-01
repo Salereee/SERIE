@@ -768,7 +768,6 @@ body:has(.rest) .toasts {
 .tpl,
 .menu > button,
 .menu > a,
-.more-list a,
 .hrow,
 .row-link,
 .exlist__item,
@@ -779,19 +778,12 @@ body:has(.rest) .toasts {
 .tpl:active,
 .menu > button:active,
 .menu > a:active,
-.more-list a:active,
 .row-link:active,
 .onb__choice:active {
   background: var(--fill);
 }
-.more-list a svg,
 .row-link > .mono {
   transition: transform var(--t-fast) var(--ease);
-}
-@media (hover: hover) and (pointer: fine) {
-  .more-list a:hover svg {
-    transform: translateX(4px);
-  }
 }
 .menu > button svg,
 .menu > a svg {
@@ -1233,4 +1225,21 @@ body:has(.rest) .toasts {
 .menu__danger,
 .menu__danger svg {
   color: var(--danger) !important;
+}
+
+/* ——— Récords ——— */
+.pr-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
+}
+.pr-row__name {
+  font-weight: 600;
+}
+.pr-row__val {
+  font-size: 15px;
+  font-weight: 500;
+  text-align: right;
 }

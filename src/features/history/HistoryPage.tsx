@@ -14,6 +14,7 @@ import { ShowMore } from '../../ui/ShowMore';
 import { deleteFinishedSession } from '../session/actions';
 import { SessionReport } from '../session/SummaryPage';
 import '../session/summary.css';
+import { PROGRESO_NAV, SegNav } from '../../ui/SegNav';
 import './history.css';
 
 export function HistoryPage() {
@@ -39,8 +40,8 @@ export function HistoryPage() {
   return (
     <div className="page">
       <header className="page-head">
-        <span className="eyebrow">{sessions.length} sesiones terminadas</span>
-        <h1 className="title-lg">Historial</h1>
+        <h1 className="title-xl">Progreso</h1>
+        <SegNav items={PROGRESO_NAV} label="Progreso" />
       </header>
       {sessions.length === 0 ? (
         <div className="empty">

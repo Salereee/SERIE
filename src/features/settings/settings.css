@@ -111,18 +111,3 @@
   transform: translateX(16px);
 }
 
-.more-list a {
-  display: grid;
-  grid-template-columns: 32px 1fr auto;
-  align-items: center;
-  gap: 8px;
-  min-height: 64px;
-  text-decoration: none;
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  border-bottom: var(--b1);
-}
-.more-list a:hover {
-  background: var(--fill);
-}

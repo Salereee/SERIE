@@ -12,6 +12,7 @@ import { ShowMore } from '../../ui/ShowMore';
 import { ExercisePicker } from '../library/ExercisePicker';
 import { BarList, Spark, WeekHeatmap } from './charts';
 import './progress.css';
+import { PROGRESO_NAV, SegNav } from '../../ui/SegNav';
 import { Help } from '../../ui/Help';
 
 const WEEK = 7 * 86400000;
@@ -80,7 +81,8 @@ export function ProgressPage() {
     return (
       <div className="page">
         <header className="page-head">
-          <h1 className="title-lg">Progreso</h1>
+          <h1 className="title-xl">Progreso</h1>
+          <SegNav items={PROGRESO_NAV} label="Progreso" />
         </header>
         <div className="empty">
           <span className="empty__title">Sin datos para graficar</span>
@@ -109,8 +111,8 @@ export function ProgressPage() {
   return (
     <div className="page">
       <header className="page-head">
-        <span className="eyebrow">{sessions.length} sesiones registradas</span>
-        <h1 className="title-lg">Progreso</h1>
+        <h1 className="title-xl">Progreso</h1>
+        <SegNav items={PROGRESO_NAV} label="Progreso" />
       </header>
 
       <div className="stat-row prog__stats" style={{ '--cols': 4 } as React.CSSProperties}>

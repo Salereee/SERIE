@@ -11,6 +11,7 @@ import { useFeedback } from '../../ui/feedback';
 import { Icon } from '../../ui/Icon';
 import { Sheet } from '../../ui/Sheet';
 import { DaysTable } from './TemplatePreview';
+import { RUTINAS_NAV, SegNav } from '../../ui/SegNav';
 import './programs.css';
 
 export function ProgramsPage() {
@@ -27,13 +28,8 @@ export function ProgramsPage() {
   return (
     <div className="page">
       <header className="page-head">
-        <span className="eyebrow">{programs.length === 1 ? '1 programa' : `${programs.length} programas`}</span>
-        <div className="page-head__row">
-          <h1 className="title-lg">Programas</h1>
-          <button className="btn btn--primary" onClick={() => setCreating(true)}>
-            <Icon name="plus" /> Nuevo programa
-          </button>
-        </div>
+        <h1 className="title-xl">Rutinas</h1>
+        <SegNav items={RUTINAS_NAV} label="Rutinas" />
       </header>
 
       {programs.length === 0 ? (
@@ -54,51 +50,46 @@ export function ProgramsPage() {
         </div>
       ) : (
         <div className="grid12">
-          <section className="span-4" aria-labelledby="mis-programas">
-            <div className="section-head">
-              <h2 id="mis-programas" className="eyebrow eyebrow--ink">
-                Mis programas
-              </h2>
-            </div>
-            <ul className="list">
-              {programs.map((p) => (
-                <li key={p.id} className="prog-row">
-                  <div className="stack" style={{ '--gap': '4px' } as React.CSSProperties}>
-                    <div className="cluster">
-                      <Link to={`/programas/${p.id}`} className="prog-row__name">
-                        {p.name}
-                      </Link>
-                      {p.id === settings.activeProgramId && <span className="tag">Activo</span>}
-                    </div>
-                    <span className="small muted">
-                      {p.days.length} días · editado {fmtDateShort(p.updatedAt)}
-                    </span>
-                  </div>
-                  {p.id !== settings.activeProgramId ? (
-                    <button
-                      className="btn btn--sm"
-                      onClick={async () => {
-                        await updateSettings({ activeProgramId: p.id });
-                        toast({ message: `Programa activo: ${p.name}` });
-                      }}
-                    >
-                      Activar
-                    </button>
-                  ) : (
-                    <Link to={`/programas/${p.id}`} className="btn btn--sm btn--ghost" aria-label={`Abrir ${p.name}`}>
-                      <Icon name="right" />
+          <section className="span-5 stack" aria-label="Mis programas" style={{ '--gap': '8px' } as React.CSSProperties}>
+            <ul className="prog-cards">
+              {programs.map((p) => {
+                const isActive = p.id === settings.activeProgramId;
+                return (
+                  <li key={p.id} className="card prog-card" data-active={isActive || undefined}>
+                    <Link to={`/programas/${p.id}`} className="prog-card__link">
+                      <span className="prog-card__name">{p.name}</span>
+                      <span className="eyebrow">
+                        {p.days.length} días · editado {fmtDateShort(p.updatedAt)}
+                      </span>
+                      {isActive && <span className="dot-live">Activo</span>}
                     </Link>
-                  )}
-                </li>
-              ))}
+                    {isActive ? (
+                      <Icon name="right" className="prog-card__chev" />
+                    ) : (
+                      <button
+                        className="btn btn--sm"
+                        onClick={async () => {
+                          await updateSettings({ activeProgramId: p.id });
+                          toast({ message: `Programa activo: ${p.name}` });
+                        }}
+                      >
+                        Activar
+                      </button>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
+            <button className="btn btn--sm prog-new" onClick={() => setCreating(true)}>
+              <Icon name="plus" size={18} /> Nuevo programa
+            </button>
           </section>
-          <section className="span-8 desktop-only" aria-labelledby="activo-titulo">
+          <section className="span-7 desktop-only" aria-labelledby="activo-titulo">
             {active ? (
               <div className="stack">
                 <div className="section-head">
                   <h2 id="activo-titulo" className="eyebrow eyebrow--ink">
-                    Activo · {active.name}
+                    {active.name}
                   </h2>
                   <Link to={`/programas/${active.id}`} className="link-btn small">
                     {settings.mode === 'avanzado' ? 'Editar' : 'Ver detalle'}
@@ -192,8 +183,8 @@ function NewProgramSheet({ onClose }: { onClose: () => void }) {
                   <span className="title-sm">{TEMPLATE_BY_KEY[t.key].name}</span>
                   <span className="small muted">{t.summary}</span>
                 </span>
-                <span className="mono small">
-                  {t.daysRange[0]}–{t.daysRange[1]} d
+                <span className="tnum small muted">
+                  {t.daysRange[0]}–{t.daysRange[1]} días
                 </span>
               </button>
             ))}
