@@ -673,7 +673,7 @@ body:has(.live-bar) .toasts {
   }
 }
 body:has(.rest) .toasts {
-  --toast-offset: 92px;
+  --toast-offset: 104px;
 }
 .toast {
   pointer-events: auto;

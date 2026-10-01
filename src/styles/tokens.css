@@ -45,7 +45,7 @@
   --tap: 48px;
   --tap-lg: 56px;
   --nav-h: 64px;
-  --timer-h: 64px;
+  --timer-h: 96px;
   --sidebar-w: 232px;
 
   /* Movimiento: curvas fuertes; nada de ease-in en UI. */
