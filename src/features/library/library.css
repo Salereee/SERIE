@@ -6,9 +6,6 @@
   display: grid;
   gap: 10px;
 }
-.browser__groups .disc--section:first-child {
-  border-top: var(--b2);
-}
 
 .ex-row {
   display: grid;
@@ -18,6 +15,7 @@
   text-align: left;
   min-height: 56px;
   padding: 9px 8px 9px 0;
+  border-radius: 10px;
   cursor: pointer;
 }
 @media (hover: hover) and (pointer: fine) {
@@ -27,7 +25,6 @@
 }
 .ex-row--selected,
 .ex-row[data-active] {
-  box-shadow: inset 4px 0 0 var(--ink);
   padding-left: 12px;
   background: var(--fill);
 }
@@ -40,7 +37,7 @@
   flex-wrap: wrap;
 }
 .ex-row__meta {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--muted);
 }
 
@@ -76,7 +73,6 @@
 .lib-detail dl {
   display: grid;
   grid-template-columns: max-content 1fr;
-  border-top: var(--b2);
   margin: 0;
 }
 .lib-detail dt,

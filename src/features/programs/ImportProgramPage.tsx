@@ -61,7 +61,7 @@ export function ImportProgramPage() {
     <div className="page">
       <header className="page-head">
         <span className="eyebrow">Rutina compartida</span>
-        <h1 className="title-lg">{state.status === 'lista' ? state.routine.program.name : state.status === 'error' ? 'No se pudo abrir la rutina' : 'Abriendo la rutina…'}</h1>
+        <h1 className="title-xl">{state.status === 'lista' ? state.routine.program.name : state.status === 'error' ? 'No se pudo abrir la rutina' : 'Abriendo la rutina…'}</h1>
       </header>
 
       {state.status === 'error' && (

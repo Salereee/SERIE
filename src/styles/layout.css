@@ -30,6 +30,7 @@
   align-items: flex-end;
   gap: 4px;
   min-width: 0;
+  flex: 1;
 }
 .title-edit .btn {
   flex: none;
@@ -37,9 +38,8 @@
 .page-head__row {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
-  gap: 12px;
-  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
 }
 
 /* Barra superior móvil: solo la marca (y el engrane en Hoy). */

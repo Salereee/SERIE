@@ -104,8 +104,8 @@ export function OnboardingPage() {
         </header>
         <div className="onb__hero">
           <div className="onb__folio">
-            <span className="eyebrow">Registro de entrenamiento</span>
-            <span className="eyebrow mono">N.º 01 · local</span>
+            <span className="eyebrow eyebrow--caps">Registro de entrenamiento</span>
+            <span className="eyebrow eyebrow--caps mono">N.º 01 · local</span>
           </div>
           <h1 className="onb__title">
             <span>Cada serie,</span>
@@ -124,7 +124,7 @@ export function OnboardingPage() {
             <span className="onb__num outline-num" aria-hidden="true">
               01
             </span>
-            <span className="eyebrow">Modo básico · 4 preguntas</span>
+            <span className="eyebrow eyebrow--caps">Modo básico · 4 preguntas</span>
             <span className="title-md">Recomiéndame un programa</span>
             <span className="muted">Te sugiero un split según tus días, experiencia, objetivo y equipo.</span>
             <Icon name="arrow" size={28} />
@@ -133,7 +133,7 @@ export function OnboardingPage() {
             <span className="onb__num outline-num" aria-hidden="true">
               02
             </span>
-            <span className="eyebrow">Modo avanzado</span>
+            <span className="eyebrow eyebrow--caps">Modo avanzado</span>
             <span className="title-md">Armo el mío</span>
             <span className="muted">Constructor desde cero o a partir de una plantilla, con RIR/RPE y supersets.</span>
             <Icon name="arrow" size={28} />
@@ -165,13 +165,13 @@ export function OnboardingPage() {
           <button className="link-btn" onClick={() => setPhase('preguntas')}>
             <Icon name="left" size={16} /> Cambiar respuestas
           </button>
-          <span className="eyebrow mono">
+          <span className="eyebrow eyebrow--caps mono">
             {q.daysPerWeek}D · {q.experience.slice(0, 3).toUpperCase()} · {q.goal.slice(0, 3).toUpperCase()}
           </span>
         </header>
         <div className="grid12">
           <section className="span-7 stack" style={{ '--gap': '20px' } as React.CSSProperties} aria-labelledby="rec-title">
-            <span className="eyebrow">Recomendado para ti</span>
+            <span className="eyebrow eyebrow--caps">Recomendado para ti</span>
             <h1 id="rec-title" className="title-xl">
               {bt.name}
             </h1>
@@ -185,10 +185,10 @@ export function OnboardingPage() {
           </section>
           <section className="span-5 stack" style={{ '--gap': '0' } as React.CSSProperties} aria-labelledby="alt-title">
             <div className="section-head">
-              <h2 id="alt-title" className="eyebrow eyebrow--ink">
+              <h2 id="alt-title" className="eyebrow eyebrow--ink eyebrow--caps">
                 Alternativas válidas
               </h2>
-              <span className="eyebrow mono">{alternatives.length}</span>
+              <span className="eyebrow eyebrow--caps mono">{alternatives.length}</span>
             </div>
             {alternatives.length === 0 && <p className="muted">Con {q.daysPerWeek} días no hay otra opción que tenga sentido.</p>}
             <ul className="list">
@@ -225,7 +225,7 @@ export function OnboardingPage() {
           <Icon name="left" size={16} /> Atrás
         </button>
         {!desktop && (
-          <span className="eyebrow mono" aria-live="polite">
+          <span className="eyebrow eyebrow--caps mono" aria-live="polite">
             {String(qi + 1).padStart(2, '0')} / {String(QUESTIONS.length).padStart(2, '0')}
           </span>
         )}

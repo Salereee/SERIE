@@ -2,29 +2,32 @@
 
 .days-table {
   display: grid;
-  border-top: var(--b2);
+  gap: 8px;
 }
+/* Cada día es una tarjeta; sus ejercicios, filas sin bordes. */
 .days-table__day {
-  padding: 12px 0 16px;
-  border-bottom: var(--b1);
+  padding: 16px 20px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
   min-width: 0;
 }
 .days-table__head {
   display: flex;
+  justify-content: space-between;
   gap: 10px;
   align-items: baseline;
-  padding-bottom: 8px;
+  padding-bottom: 6px;
 }
 .days-table__item {
   display: flex;
   justify-content: space-between;
   gap: 12px;
   padding: 6px 0;
-  border-top: var(--bs);
   font-size: 15px;
 }
-.days-table__item > .mono {
+.days-table__rx {
   white-space: nowrap;
+  font-size: 15px;
 }
 .days-table--compact .days-table__item {
   font-size: 14px;
@@ -32,15 +35,7 @@
 }
 @media (min-width: 900px) {
   .days-table--wide {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    border-top: 0;
-    gap: 0;
-    border-left: var(--b1);
-  }
-  .days-table--wide .days-table__day {
-    border-top: var(--b2);
-    border-right: var(--b1);
-    padding: 12px 14px 16px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   }
   .days-table--wide .days-table__item {
     flex-direction: column;
@@ -95,15 +90,15 @@
 
 .tpl-grid {
   display: grid;
-  border-top: var(--b2);
+  gap: 4px;
 }
 .tpl {
   display: grid;
   grid-template-columns: 56px 1fr auto;
   gap: 12px;
   align-items: center;
-  padding: 12px 0;
-  border-bottom: var(--b1);
+  padding: 12px;
+  border-radius: var(--radius);
   text-align: left;
   width: 100%;
 }
@@ -114,7 +109,8 @@
   font-family: var(--font-mono);
   font-weight: 500;
   font-size: 14px;
-  border: var(--b1);
+  border-radius: 10px;
+  background: var(--fill);
   height: 40px;
   display: grid;
   place-items: center;
@@ -211,6 +207,7 @@
   position: absolute;
   left: 0;
   width: 4px;
+  border-radius: 2px;
   background: var(--ink);
   top: 12px;
   bottom: 0;
@@ -251,7 +248,7 @@
 }
 .bitem__sum {
   grid-area: sum;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
@@ -301,7 +298,7 @@
   gap: 8px;
 }
 .bitem__fields .field__label {
-  font-size: 10px;
+  font-size: 13px;
 }
 .bitem__fields .input,
 .bitem__fields .select {
@@ -337,3 +334,7 @@
   color: var(--ink);
 }
 
+
+.prog__meta {
+  justify-content: space-between;
+}

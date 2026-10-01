@@ -9,7 +9,7 @@ import { suggest } from '../../domain/progression';
 import { computeRecords } from '../../domain/records';
 import { fmtVolume, fmtWeight, toDisplay } from '../../domain/units';
 import { Icon } from '../../ui/Icon';
-import { Meta } from '../../ui/Meta';
+import { Help } from '../../ui/Help';
 import { ShowMore } from '../../ui/ShowMore';
 import { LineChart, type Point } from './charts';
 import './progress.css';
@@ -75,14 +75,20 @@ export function ExerciseProgressPage() {
 
   const nf = (v: number) => `${v.toLocaleString('es-MX', { maximumFractionDigits: 1 })}`;
 
+  const hero = advanced
+    ? { label: '1RM estimado', value: rec.best1RM, date: rec.best1RMDate }
+    : { label: 'Peso máximo', value: rec.bestWeight, date: rec.bestWeightDate };
+
   return (
     <div className="page">
       <header className="page-head">
-        <Link to="/progreso" className="link-btn small" style={{ width: 'fit-content' }}>
-          <Icon name="left" size={16} /> Progreso
+        <Link to="/progreso" className="btn btn--text back-link">
+          <Icon name="left" size={18} /> Progreso
         </Link>
-        <Meta parts={[MUSCLE_LABEL[exercise.primaryMuscle], EQUIPMENT_LABEL[exercise.equipment], exercise.kind]} />
-        <h1 className="title-lg">{exercise.name}</h1>
+        <h1 className="title-xl">{exercise.name}</h1>
+        <span className="eyebrow">
+          {MUSCLE_LABEL[exercise.primaryMuscle]} · {EQUIPMENT_LABEL[exercise.equipment]}
+        </span>
       </header>
 
       {logs.length === 0 ? (
@@ -92,68 +98,67 @@ export function ExerciseProgressPage() {
         </div>
       ) : (
         <>
-          <div className="stat-row prog__stats" style={{ '--cols': advanced ? 4 : 3 } as React.CSSProperties}>
-            <div className="stat">
-              <span className="eyebrow">Peso máximo</span>
-              <span className="num-lg">
-                {fmtWeight(rec.bestWeight, unit)}
-                <span className="unit">{unit}</span>
-              </span>
-              {rec.bestWeightDate && <span className="small muted">{fmtDateShort(rec.bestWeightDate)}</span>}
-            </div>
-            {advanced && (
-              <div className="stat">
-                <span className="eyebrow">1RM estimado</span>
-                <span className="num-lg">
-                  {fmtWeight(rec.best1RM, unit)}
+          <div className="grid12" style={{ rowGap: 'var(--block-gap)' }}>
+            <section className="span-8 stack" style={{ '--gap': '8px' } as React.CSSProperties} aria-label="Resumen y gráfica">
+              <div className="card prog__hero">
+                <span className="prog__heronum mono">
+                  {fmtWeight(hero.value, unit)}
                   <span className="unit">{unit}</span>
                 </span>
-                {rec.best1RMDate && <span className="small muted">{fmtDateShort(rec.best1RMDate)}</span>}
+                <span className="prog__herolabel">
+                  {hero.label}
+                  {hero.date ? ` · ${fmtDateShort(hero.date)}` : ''} {advanced && <Help term="epley" always />}
+                </span>
               </div>
-            )}
-            <div className="stat">
-              <span className="eyebrow">Mejor volumen</span>
-              <span className="num-lg">
-                {fmtVolume(rec.bestVolume, unit)}
-                <span className="unit">{unit}</span>
-              </span>
-              {rec.bestVolumeDate && <span className="small muted">{fmtDateShort(rec.bestVolumeDate)}</span>}
-            </div>
-            <div className="stat">
-              <span className="eyebrow">Sesiones</span>
-              <span className="num-lg">{rec.sessions}</span>
-            </div>
-          </div>
-
-          <div className="grid12" style={{ rowGap: 32 }}>
-            <section className="span-8 stack" aria-label="Gráfica">
-{advanced ? (
-              <div className="tabs-line" role="tablist" aria-label="Métrica">
-                <button role="tab" aria-selected={metric === '1rm'} onClick={() => setMetric('1rm')}>
-                  1RM estimado
-                </button>
-                <button role="tab" aria-selected={metric === 'peso'} onClick={() => setMetric('peso')}>
-                  Peso máximo
-                </button>
+              <div className="stat-row" style={{ '--cols': 2 } as React.CSSProperties}>
+                {advanced ? (
+                  <div className="stat">
+                    <span className="num-lg">
+                      {fmtWeight(rec.bestWeight, unit)}
+                      <span className="unit">{unit}</span>
+                    </span>
+                    <span className="eyebrow">peso máximo</span>
+                  </div>
+                ) : (
+                  <div className="stat">
+                    <span className="num-lg">
+                      {fmtVolume(rec.bestVolume, unit)}
+                      <span className="unit">{unit}</span>
+                    </span>
+                    <span className="eyebrow">mejor volumen</span>
+                  </div>
+                )}
+                <div className="stat">
+                  <span className="num-lg">{rec.sessions}</span>
+                  <span className="eyebrow">{rec.sessions === 1 ? 'sesión' : 'sesiones'}</span>
+                </div>
               </div>
-              ) : (
-                <h2 className="eyebrow eyebrow--ink">Peso máximo por sesión</h2>
-              )}
-              {points.length > 1 ? (
-                <LineChart points={points} format={(v) => `${nf(v)}`} title={`${metric === '1rm' ? '1RM estimado' : 'Peso máximo'} de ${exercise.name} en ${unit}`} />
-              ) : (
-                <p className="muted">Con una sola sesión todavía no hay línea; vuelve después de la siguiente.</p>
-              )}
-              <p className="small muted">
-                {metric === '1rm' ? '1RM estimado con Epley: peso × (1 + reps / 30), mejor serie de cada sesión.' : 'Peso más alto de una serie efectiva por sesión.'} Valores en {unit}. Los puntos de
-                color marcan récords.
-              </p>
+              <div className="card stack xp__chart" style={{ '--gap': '12px' } as React.CSSProperties}>
+                {advanced ? (
+                  <div className="seg" role="tablist" aria-label="Métrica">
+                    <button role="tab" aria-selected={metric === '1rm'} onClick={() => setMetric('1rm')}>
+                      1RM estimado
+                    </button>
+                    <button role="tab" aria-selected={metric === 'peso'} onClick={() => setMetric('peso')}>
+                      Peso máximo
+                    </button>
+                  </div>
+                ) : (
+                  <h2 className="eyebrow eyebrow--ink">Peso máximo por sesión</h2>
+                )}
+                {points.length > 1 ? (
+                  <LineChart points={points} format={(v) => `${nf(v)}`} title={`${metric === '1rm' ? '1RM estimado' : 'Peso máximo'} de ${exercise.name} en ${unit}`} />
+                ) : (
+                  <p className="muted">Con una sola sesión todavía no hay línea; vuelve después de la siguiente.</p>
+                )}
+                <p className="small muted">Valores en {unit}. Los puntos de color marcan récords.</p>
+              </div>
             </section>
 
             <aside className="span-4 stack" style={{ '--gap': '24px' } as React.CSSProperties}>
               {sug && (
                 <section className="note" aria-label="Sugerencia para la próxima sesión">
-                  <span className="eyebrow eyebrow--ink">Próxima sesión</span>
+                  <span className="eyebrow">Próxima sesión</span>
                   <span className="num-md">
                     {fmtWeight(sug.weightKg, unit)} {unit} × {sug.reps}
                   </span>
@@ -196,14 +201,14 @@ export function ExerciseProgressPage() {
                 <h2 id="hist-ex" className="eyebrow eyebrow--ink">
                   Historial de sesiones
                 </h2>
-                <span className="eyebrow mono">{logs.length}</span>
+                <span>{logs.length}</span>
               </div>
               <ShowMore items={logsDesc} limit={5} noun="sesiones">
                 {(visible) => (
               <ol>
                 {visible.map((l) => (
                   <li key={l.id} className="xh">
-                    <Link to={`/historial/${l.sessionId}`} className="eyebrow eyebrow--ink" title={fmtDateFull(l.date)}>
+                    <Link to={`/historial/${l.sessionId}`} className="xh__date tnum" title={fmtDateFull(l.date)}>
                       {fmtDateShort(l.date)}
                     </Link>
                     <span className="xh__sets mono">

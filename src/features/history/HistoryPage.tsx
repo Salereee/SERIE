@@ -1,20 +1,17 @@
-import { useCallback } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { db } from '../../db/db';
-import { useSettings } from '../../db/hooks';
 import type { Session } from '../../db/schema';
 import { fmtDuration, fmtMonthYear } from '../../domain/format';
-import { fmtVolume } from '../../domain/units';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useFeedback } from '../../ui/feedback';
-import { Disclosure, ToggleAll, useOpenSections } from '../../ui/Disclosure';
 import { Icon } from '../../ui/Icon';
 import { ShowMore } from '../../ui/ShowMore';
 import { deleteFinishedSession } from '../session/actions';
 import { SessionReport } from '../session/SummaryPage';
 import '../session/summary.css';
 import { PROGRESO_NAV, SegNav } from '../../ui/SegNav';
+import '../progress/progress.css';
 import './history.css';
 
 export function HistoryPage() {
@@ -29,8 +26,8 @@ export function HistoryPage() {
   if (!desktop && id) {
     return (
       <div className="page">
-        <Link to="/historial" className="link-btn small" style={{ width: 'fit-content' }}>
-          <Icon name="left" size={16} /> Historial
+        <Link to="/historial" className="btn btn--text back-link">
+          <Icon name="left" size={18} /> Historial
         </Link>
         {selected ? <Detail session={selected} /> : <p className="muted">Sesión no encontrada.</p>}
       </div>
@@ -72,72 +69,61 @@ export function HistoryPage() {
   );
 }
 
+function monthLabel(t: number) {
+  const now = new Date();
+  const d = new Date(t);
+  const m = d.toLocaleDateString('es-MX', { month: 'long' });
+  const label = d.getFullYear() === now.getFullYear() ? m : fmtMonthYear(t);
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
 function SessionList({ sessions, selectedId }: { sessions: Session[]; selectedId?: string }) {
-  const { unit } = useSettings();
   const groups: { key: string; label: string; items: Session[] }[] = [];
   for (const s of sessions) {
-    const label = fmtMonthYear(s.startedAt);
+    const key = fmtMonthYear(s.startedAt);
     const g = groups[groups.length - 1];
-    if (g && g.label === label) g.items.push(s);
-    else groups.push({ key: label, label, items: [s] });
+    if (g && g.key === key) g.items.push(s);
+    else groups.push({ key, label: monthLabel(s.startedAt), items: [s] });
   }
-  // El mes más reciente abierto; los anteriores cerrados con su resumen.
-  const newest = groups[0]?.key;
-  const defaults = useCallback((id: string) => id === newest, [newest]);
-  const { isOpen, setOpen, setAll } = useOpenSections('historial', defaults);
-  const ids = groups.map((g) => g.key);
-  const allOpen = ids.every(isOpen);
 
   return (
-    <div className="stack" style={{ '--gap': '0' } as React.CSSProperties}>
-      {groups.length > 1 && (
-        <div className="section-tools" style={{ paddingBottom: 8 }}>
-          <span className="eyebrow">Por mes</span>
-          <ToggleAll allOpen={allOpen} onChange={(o) => setAll(ids, o)} />
-        </div>
-      )}
-      {groups.map((g) => {
-        const vol = g.items.reduce((a, s) => a + (s.summary?.volumeKg ?? 0), 0);
-        const prs = g.items.reduce((a, s) => a + (s.summary?.prs.length ?? 0), 0);
-        return (
-          <Disclosure
-            key={g.key}
-            sticky
-            lazy
-            title={g.label}
-            summary={`${g.items.length} ses. · ${fmtVolume(vol / 1000, unit)} ${unit === 'kg' ? 't' : 'k lb'}${prs ? ` · ${prs} PR` : ''}`}
-            open={isOpen(g.key) || g.items.some((s) => s.id === selectedId)}
-            onToggle={(o) => setOpen(g.key, o)}
-          >
-            <ShowMore items={g.items} limit={6} noun="sesiones">
-              {(visible) => (
-                <ul className="list">
-                  {visible.map((s) => {
-                    const d = new Date(s.startedAt);
-                    return (
-                      <li key={s.id}>
-                        <Link to={`/historial/${s.id}`} className="hrow" aria-current={s.id === selectedId || undefined}>
-                          <span className="hrow__date">
-                            <span className="num-md">{String(d.getDate()).padStart(2, '0')}</span>
-                            <span className="eyebrow">{d.toLocaleDateString('es-MX', { weekday: 'short' }).replace('.', '')}</span>
+    <div className="stack" style={{ '--gap': 'var(--block-gap)' } as React.CSSProperties}>
+      {groups.map((g) => (
+        <section key={g.key} aria-label={g.label}>
+          <div className="section-head">
+            <h2 className="eyebrow eyebrow--ink">
+              {g.label} <span className="muted tnum">· {g.items.length} {g.items.length === 1 ? 'sesión' : 'sesiones'}</span>
+            </h2>
+          </div>
+          <ShowMore items={g.items} limit={6} noun="sesiones">
+            {(visible) => (
+              <ul className="hcards">
+                {visible.map((s) => {
+                  const d = new Date(s.startedAt);
+                  const prs = s.summary?.prs.length ?? 0;
+                  return (
+                    <li key={s.id}>
+                      <Link to={`/historial/${s.id}`} className="hrow" aria-current={s.id === selectedId || undefined}>
+                        <span className="hrow__date">
+                          <span className="mono">{d.getDate()}</span>
+                          <span>{d.toLocaleDateString('es-MX', { weekday: 'short' }).replace('.', '')}</span>
+                        </span>
+                        <span className="stack" style={{ '--gap': '2px' } as React.CSSProperties}>
+                          <span className="hrow__title">{s.dayName}</span>
+                          <span className="eyebrow">
+                            {fmtDuration(s.durationSec ?? 0)} · {s.summary?.setsDone ?? 0} series
                           </span>
-                          <span className="stack" style={{ '--gap': '2px' } as React.CSSProperties}>
-                            <span className="hrow__title">{s.dayName}</span>
-                            <span className="small muted mono">
-                              {fmtDuration(s.durationSec ?? 0)} · {fmtVolume(s.summary?.volumeKg ?? 0, unit)} {unit} · {s.summary?.setsDone ?? 0} series
-                            </span>
-                          </span>
-                          {(s.summary?.prs.length ?? 0) > 0 && <span className="tag tag--accent">{s.summary!.prs.length} PR</span>}
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </ShowMore>
-          </Disclosure>
-        );
-      })}
+                        </span>
+                        {prs > 0 && <span className="hrow__pr tnum">{prs} PR</span>}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </ShowMore>
+        </section>
+      ))}
     </div>
   );
 }
@@ -161,7 +147,7 @@ function Detail({ session }: { session: Session }) {
     <div className="stack" style={{ '--gap': '24px' } as React.CSSProperties}>
       <SessionReport session={session} />
       <div>
-        <button className="btn btn--danger btn--sm" onClick={remove}>
+        <button className="btn btn--sm btn--danger" onClick={remove}>
           <Icon name="trash" size={16} /> Borrar sesión
         </button>
       </div>

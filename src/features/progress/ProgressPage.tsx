@@ -6,23 +6,25 @@ import { useExerciseMap, useSettings } from '../../db/hooks';
 import { MUSCLE_LABEL, showsAdvancedMetrics, type ExerciseLog, type Muscle, type Session } from '../../db/schema';
 import { fmtDateShort, fmtRelativeDay, startOfWeek } from '../../domain/format';
 import { fmtVolume, fmtWeight } from '../../domain/units';
-import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { Icon } from '../../ui/Icon';
 import { ShowMore } from '../../ui/ShowMore';
 import { ExercisePicker } from '../library/ExercisePicker';
-import { BarList, Spark, WeekHeatmap } from './charts';
+import { BarList, Spark, WeekBars } from './charts';
 import './progress.css';
 import { PROGRESO_NAV, SegNav } from '../../ui/SegNav';
 import { Help } from '../../ui/Help';
+import { Disclosure, useOpenSections } from '../../ui/Disclosure';
+import { PRRow } from '../../ui/PRRow';
 
 const WEEK = 7 * 86400000;
+const closedByDefault = () => false;
 
 export function ProgressPage() {
   const settings = useSettings();
   const { unit } = settings;
   const advanced = showsAdvancedMetrics(settings);
   const ex = useExerciseMap();
-  const desktop = useMediaQuery('(min-width: 900px)');
+  const folds = useOpenSections('progreso', closedByDefault);
   const sessions = useLiveQuery(() => db.sessions.where('status').equals('terminada').toArray(), [], undefined as Session[] | undefined);
   const logs = useLiveQuery(() => db.logs.toArray(), [], [] as ExerciseLog[]);
   const [weekOffset, setWeekOffset] = useState(0);
@@ -44,8 +46,7 @@ export function ProgressPage() {
       else if (w !== thisWeek) break; // la semana en curso aún puede llenarse
       if (streak > 520) break;
     }
-    const vol7 = ss.filter((s) => s.startedAt >= now - 7 * 86400000).reduce((a, s) => a + (s.summary?.volumeKg ?? 0), 0);
-    return { last30, perWeek: last8w / 8, streak, vol7 };
+    return { last30, perWeek: last8w / 8, streak };
   }, [sessions, now, thisWeek]);
 
   // Volumen y series por grupo muscular (músculo principal), últimas 8 semanas.
@@ -108,149 +109,155 @@ export function ProgressPage() {
     .map(([muscle, v]) => ({ key: muscle, label: MUSCLE_LABEL[muscle], value: v.vol[7], sub: `${v.sets[7]} s` }));
   const maxSpark = Math.max(1, ...muscleWeeks.flatMap(([, v]) => v.sets));
 
+  const prs = [...sessions]
+    .sort((a, b) => b.startedAt - a.startedAt)
+    .flatMap((x) => (x.summary?.prs ?? []).filter((p) => p.kind !== 'volumen').map((p) => ({ ...p, date: x.startedAt })))
+    .slice(0, 3);
+
   return (
-    <div className="page">
+    <div className="page prog">
       <header className="page-head">
         <h1 className="title-xl">Progreso</h1>
         <SegNav items={PROGRESO_NAV} label="Progreso" />
       </header>
 
-      <div className="stat-row prog__stats" style={{ '--cols': 4 } as React.CSSProperties}>
-        <div className="stat">
-          <span className="eyebrow">Últimos 30 días</span>
-          <span className="num-lg">{stats.last30}</span>
-          <span className="small muted">sesiones</span>
-        </div>
-        <div className="stat">
-          <span className="eyebrow">Por semana</span>
-          <span className="num-lg">{stats.perWeek.toLocaleString('es-MX', { maximumFractionDigits: 1 })}</span>
-          <span className="small muted">promedio 8 semanas</span>
-        </div>
-        <div className="stat">
-          <span className="eyebrow">Racha</span>
-          <span className="num-lg">{stats.streak}</span>
-          <span className="small muted">semanas seguidas</span>
-        </div>
-        <div className="stat">
-          <span className="eyebrow">Volumen 7 días <Help term="volumen" /></span>
-          <span className="num-lg">
-            {fmtVolume(stats.vol7, unit)}
-            <span className="unit">{unit}</span>
-          </span>
-        </div>
-      </div>
-
       <div className="grid12 prog__grid">
-        <section className="span-6" aria-labelledby="freq">
-          <div className="section-head">
-            <h2 id="freq" className="eyebrow eyebrow--ink">
-              Frecuencia
-            </h2>
-            <span className="eyebrow">{desktop ? '26' : '16'} semanas</span>
-          </div>
-          <WeekHeatmap sessions={sessions} weeks={desktop ? 26 : 16} />
-        </section>
-
-        <section className="span-6" aria-labelledby="vol">
-          <div className="section-head">
-            <h2 id="vol" className="eyebrow eyebrow--ink">
-              Volumen por grupo muscular
-            </h2>
-            <div className="weeknav">
-              <button className="btn btn--ghost btn--icon" onClick={() => setWeekOffset(weekOffset + 1)} aria-label="Semana anterior">
-                <Icon name="left" size={18} />
-              </button>
-              <span className="mono small" aria-live="polite">
-                {weekOffset === 0 ? 'Esta semana' : `Sem. ${fmtDateShort(selWeek)}`}
-              </span>
-              <button className="btn btn--ghost btn--icon" onClick={() => setWeekOffset(Math.max(0, weekOffset - 1))} disabled={weekOffset === 0} aria-label="Semana siguiente">
-                <Icon name="right" size={18} />
-              </button>
+        <div className="span-6 stack prog__col" style={{ '--gap': '8px' } as React.CSSProperties}>
+          <section className="card prog__hero" aria-label="Sesiones en los últimos 30 días">
+            <span className="prog__heronum mono">{stats.last30}</span>
+            <span className="prog__herolabel">{stats.last30 === 1 ? 'sesión' : 'sesiones'} en los últimos 30 días</span>
+          </section>
+          <div className="stat-row" style={{ '--cols': 2 } as React.CSSProperties}>
+            <div className="stat">
+              <span className="num-lg">{stats.perWeek.toLocaleString('es-MX', { maximumFractionDigits: 1 })}</span>
+              <span className="eyebrow">por semana</span>
+            </div>
+            <div className="stat">
+              <span className="num-lg">{stats.streak}</span>
+              <span className="eyebrow">{stats.streak === 1 ? 'semana seguida' : 'semanas seguidas'}</span>
             </div>
           </div>
-          {weekBars.length ? (
-            <BarList bars={weekBars} format={(v) => `${fmtVolume(v, unit)} ${unit}`} />
-          ) : (
-            <p className="muted" style={{ padding: '12px 0' }}>
-              Sin series esa semana.
-            </p>
-          )}
-          <p className="small muted" style={{ marginTop: 8 }}>
-            Volumen = peso × reps de series efectivas, asignado al músculo principal. «s» = series.
-          </p>
-        </section>
+          <section className="card prog__weeks" aria-labelledby="freq">
+            <div className="section-head">
+              <h2 id="freq" className="eyebrow eyebrow--ink">
+                Sesiones por semana
+              </h2>
+              <span>12 semanas</span>
+            </div>
+            <WeekBars sessions={sessions} weeks={12} />
+          </section>
+        </div>
 
-        <section className="span-6" aria-labelledby="ejs">
-          <div className="section-head">
-            <h2 id="ejs" className="eyebrow eyebrow--ink">
-              Por ejercicio
-            </h2>
-            <button className="link-btn small" onClick={() => setPicking(true)}>
-              Buscar ejercicio
-            </button>
-          </div>
-          <ShowMore items={byExercise} limit={5} noun="ejercicios">
-            {(visible) => (
-          <ul className="list">
-            {visible.map(([id, v]) => (
-              <li key={id}>
-                <Link className="row-link" to={`/progreso/${id}`}>
-                  <span className="stack" style={{ '--gap': '2px' } as React.CSSProperties}>
-                    <span className="row-link__title title-sm" style={{ fontSize: 16 }}>
-                      {ex.get(id)?.name ?? id}
-                    </span>
-                    <span className="small muted">
-                      {v.n} sesiones · {fmtRelativeDay(v.last)}
-                    </span>
-                  </span>
-                  <span className="mono" title={advanced ? '1RM estimado' : 'Peso máximo'}>
-                    {v.best > 0 ? `${fmtWeight(v.best, unit)} ${unit}` : '—'}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <div className="span-6 stack prog__col" style={{ '--gap': 'var(--block-gap)' } as React.CSSProperties}>
+          <section aria-labelledby="prs">
+            <div className="section-head">
+              <h2 id="prs" className="eyebrow eyebrow--ink">
+                Récords recientes <Help term="records" />
+              </h2>
+            </div>
+            {prs.length ? (
+              <ul className="list">
+                {prs.map((p, i) => (
+                  <PRRow key={i} pr={p} date={p.date} name={ex.get(p.exerciseId)?.name ?? ''} />
+                ))}
+              </ul>
+            ) : (
+              <p className="muted">Los récords aparecen cuando superas una marca anterior en un ejercicio.</p>
             )}
-          </ShowMore>
-        </section>
+          </section>
 
-        <section className="span-6" aria-labelledby="tend">
-          <div className="section-head">
-            <h2 id="tend" className="eyebrow eyebrow--ink">
-              Series por semana · 8 semanas
-            </h2>
+          <section aria-labelledby="ejs">
+            <div className="section-head">
+              <h2 id="ejs" className="eyebrow eyebrow--ink">
+                Por ejercicio
+              </h2>
+              <button className="link-btn" onClick={() => setPicking(true)}>
+                Buscar
+              </button>
+            </div>
+            <ShowMore items={byExercise} limit={5} noun="ejercicios">
+              {(visible) => (
+                <ul className="list">
+                  {visible.map(([id, v]) => (
+                    <li key={id}>
+                      <Link className="row-link" to={`/progreso/${id}`}>
+                        <span className="stack" style={{ '--gap': '2px' } as React.CSSProperties}>
+                          <span className="row-link__title">{ex.get(id)?.name ?? id}</span>
+                          <span className="eyebrow">
+                            {v.n} sesiones · {fmtRelativeDay(v.last)}
+                          </span>
+                        </span>
+                        <span className="mono" title={advanced ? '1RM estimado' : 'Peso máximo'}>
+                          {v.best > 0 ? `${fmtWeight(v.best, unit)} ${unit}` : '—'}
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </ShowMore>
+          </section>
+
+          <div>
+            <Disclosure
+              title="Volumen por grupo muscular"
+              summary={weekOffset === 0 ? 'Esta semana' : `Sem. ${fmtDateShort(selWeek)}`}
+              open={folds.isOpen('volumen')}
+              onToggle={(o) => folds.setOpen('volumen', o)}
+              lazy
+            >
+              <div className="stack" style={{ '--gap': '12px' } as React.CSSProperties}>
+                <div className="weeknav">
+                  <button className="btn btn--ghost btn--icon" onClick={() => setWeekOffset(weekOffset + 1)} aria-label="Semana anterior">
+                    <Icon name="left" size={18} />
+                  </button>
+                  <span className="tnum" aria-live="polite">
+                    {weekOffset === 0 ? 'Esta semana' : `Semana del ${fmtDateShort(selWeek)}`}
+                  </span>
+                  <button className="btn btn--ghost btn--icon" onClick={() => setWeekOffset(Math.max(0, weekOffset - 1))} disabled={weekOffset === 0} aria-label="Semana siguiente">
+                    <Icon name="right" size={18} />
+                  </button>
+                </div>
+                {weekBars.length ? <BarList bars={weekBars} format={(v) => `${fmtVolume(v, unit)} ${unit}`} /> : <p className="muted">Sin series esa semana.</p>}
+                <p className="small muted">
+                  Volumen = peso × reps de series efectivas, asignado al músculo principal. «s» = series. <Help term="volumen" />
+                </p>
+              </div>
+            </Disclosure>
+            <Disclosure title="Series por grupo · 8 semanas" open={folds.isOpen('series')} onToggle={(o) => folds.setOpen('series', o)} lazy>
+              <ShowMore items={muscleWeeks} limit={6} noun="grupos">
+                {(visible) => (
+                  <table className="trend">
+                    <thead>
+                      <tr>
+                        <th scope="col">Grupo</th>
+                        <th scope="col">Tendencia</th>
+                        <th scope="col" className="num">
+                          Sem.
+                        </th>
+                        <th scope="col" className="num">
+                          Prom.
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {visible.map(([muscle, v]) => (
+                        <tr key={muscle}>
+                          <th scope="row">{MUSCLE_LABEL[muscle]}</th>
+                          <td>
+                            <Spark values={v.sets} max={maxSpark} />
+                          </td>
+                          <td className="mono num">{v.sets[7]}</td>
+                          <td className="mono num muted">{(v.sets.reduce((a, b) => a + b, 0) / 8).toLocaleString('es-MX', { maximumFractionDigits: 1 })}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </ShowMore>
+            </Disclosure>
           </div>
-          <ShowMore items={muscleWeeks} limit={6} noun="grupos">
-            {(visible) => (
-          <table className="trend">
-            <thead>
-              <tr>
-                <th scope="col">Grupo</th>
-                <th scope="col">Tendencia</th>
-                <th scope="col" className="num">
-                  Sem.
-                </th>
-                <th scope="col" className="num">
-                  Prom.
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {visible.map(([muscle, v]) => (
-                <tr key={muscle}>
-                  <th scope="row">{MUSCLE_LABEL[muscle]}</th>
-                  <td>
-                    <Spark values={v.sets} max={maxSpark} />
-                  </td>
-                  <td className="mono num">{v.sets[7]}</td>
-                  <td className="mono num muted">{(v.sets.reduce((a, b) => a + b, 0) / 8).toLocaleString('es-MX', { maximumFractionDigits: 1 })}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-            )}
-          </ShowMore>
-        </section>
+        </div>
       </div>
 
       {picking && (

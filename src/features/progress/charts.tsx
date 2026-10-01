@@ -1,66 +1,36 @@
 import { useId, useMemo, useRef, useState } from 'react';
 import type { Session } from '../../db/schema';
-import { fmtDateFull, fmtDateShort, startOfDay, startOfWeek } from '../../domain/format';
+import { fmtDateFull, fmtDateShort, startOfWeek } from '../../domain/format';
 import './charts.css';
 
-/* ——— Heatmap semanal: columnas = semanas, filas = L…D ——— */
+/* ——— Sesiones por semana: una barra por semana, la actual en acento ——— */
 
-export function WeekHeatmap({ sessions, weeks = 12 }: { sessions: Pick<Session, 'startedAt' | 'summary'>[]; weeks?: number }) {
-  const [hover, setHover] = useState<{ t: number; n: number; sets: number } | null>(null);
-  const cells = useMemo(() => {
-    const byDay = new Map<number, { n: number; sets: number }>();
+export function WeekBars({ sessions, weeks = 12 }: { sessions: Pick<Session, 'startedAt'>[]; weeks?: number }) {
+  const counts = useMemo(() => {
+    const WEEK = 7 * 86400000;
+    const current = startOfWeek(Date.now());
+    const out = Array<number>(weeks).fill(0);
     for (const s of sessions) {
-      const d = startOfDay(s.startedAt);
-      const cur = byDay.get(d) ?? { n: 0, sets: 0 };
-      byDay.set(d, { n: cur.n + 1, sets: cur.sets + (s.summary?.setsDone ?? 0) });
-    }
-    const first = startOfWeek(Date.now()) - (weeks - 1) * 7 * 86400000;
-    const out: { t: number; n: number; sets: number; future: boolean }[] = [];
-    const today = startOfDay(Date.now());
-    for (let w = 0; w < weeks; w++) {
-      for (let d = 0; d < 7; d++) {
-        const date = new Date(first);
-        date.setDate(date.getDate() + w * 7 + d);
-        const t = date.getTime();
-        const v = byDay.get(t) ?? { n: 0, sets: 0 };
-        out.push({ t, ...v, future: t > today });
-      }
+      const i = weeks - 1 - Math.round((current - startOfWeek(s.startedAt)) / WEEK);
+      if (i >= 0 && i < weeks) out[i]++;
     }
     return out;
   }, [sessions, weeks]);
-
-  const level = (sets: number, n: number) => (n === 0 ? 0 : sets >= 24 ? 3 : sets >= 14 ? 2 : 1);
-  const trained = cells.filter((c) => c.n > 0).length;
-
+  const max = Math.max(1, ...counts);
+  const first = startOfWeek(Date.now()) - (weeks - 1) * 7 * 86400000;
   return (
-    <figure className="heat" aria-label={`Calendario de las últimas ${weeks} semanas: ${trained} días entrenados`}>
-      <div className="heat__grid" style={{ gridTemplateColumns: `20px repeat(${weeks}, 1fr)` }} onMouseLeave={() => setHover(null)}>
-        {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((l, i) => (
-          <span key={i} className="heat__label" style={{ gridColumn: 1, gridRow: i + 1 }} aria-hidden="true">
-            {i % 2 === 0 ? l : ''}
+    <figure className="wbars" aria-label={`Sesiones por semana, últimas ${weeks}: ${counts.join(', ')}. Esta semana: ${counts[weeks - 1]}.`}>
+      <div className="wbars__cols" aria-hidden="true">
+        {counts.map((n, i) => (
+          <span key={i} className="wbars__col" data-current={i === weeks - 1 || undefined} title={`${n} ${n === 1 ? 'sesión' : 'sesiones'}`}>
+            <span className="wbars__n tnum">{n || ''}</span>
+            <span className="wbars__bar" style={{ height: `${(n / max) * 100}%` }} />
           </span>
         ))}
-        {cells.map((c, i) => (
-          <span
-            key={c.t}
-            className="heat__cell"
-            data-level={c.future ? undefined : level(c.sets, c.n)}
-            data-future={c.future || undefined}
-            style={{ gridColumn: Math.floor(i / 7) + 2, gridRow: (i % 7) + 1, '--col': Math.floor(i / 7) } as React.CSSProperties}
-            onMouseEnter={() => setHover(c)}
-            title={`${fmtDateFull(c.t)}: ${c.n ? `${c.sets} series` : 'sin sesión'}`}
-          />
-        ))}
       </div>
-      <figcaption className="heat__caption">
-        <span className="eyebrow">{hover ? `${fmtDateFull(hover.t)} · ${hover.n ? `${hover.sets} series` : 'sin sesión'}` : `${trained} días en ${weeks} semanas`}</span>
-        <span className="heat__legend" aria-hidden="true">
-          <span className="eyebrow">menos</span>
-          {[0, 1, 2, 3].map((l) => (
-            <span key={l} className="heat__cell" data-level={l} />
-          ))}
-          <span className="eyebrow">más</span>
-        </span>
+      <figcaption className="wbars__axis" aria-hidden="true">
+        <span>{fmtDateShort(first)}</span>
+        <span>Esta semana</span>
       </figcaption>
     </figure>
   );

@@ -1,9 +1,8 @@
 import { useCallback, useState } from 'react';
 import type { Equipment, Exercise } from '../../db/schema';
 import { EQUIPMENT_LABEL, MUSCLE_LABEL } from '../../db/schema';
-import { Disclosure, ToggleAll, useOpenSections } from '../../ui/Disclosure';
+import { Disclosure, useOpenSections } from '../../ui/Disclosure';
 import { Icon } from '../../ui/Icon';
-import { Select } from '../../ui/Select';
 import { ShowMore } from '../../ui/ShowMore';
 import { EQUIPMENT_OPTIONS, useExerciseGroups } from './useExerciseFilter';
 import './library.css';
@@ -22,10 +21,8 @@ export function ExerciseBrowser({ onPick, selectedId }: Props) {
   const [equipment, setEquipment] = useState<Equipment | 'todos'>('todos');
   const { groups, recents, count, total, loaded } = useExerciseGroups({ q, equipment, muscle: null });
   const defaults = useCallback((id: string) => id === 'recientes', []);
-  const { isOpen, setOpen, setAll } = useOpenSections('biblioteca', defaults);
+  const { isOpen, setOpen } = useOpenSections('biblioteca', defaults);
   const filtering = q.trim() !== '' || equipment !== 'todos';
-  const ids = groups.map((g) => g.key);
-  const allOpen = ids.every(isOpen);
 
   return (
     <div className="browser">
@@ -43,17 +40,18 @@ export function ExerciseBrowser({ onPick, selectedId }: Props) {
             autoComplete="off"
           />
         </label>
-        <div className="section-tools">
-          <Select label="Equipo" value={equipment} options={EQUIPMENT_OPTIONS} onChange={setEquipment} />
-          <span className="cluster">
-            {filtering && (
-              <span className="eyebrow mono" aria-live="polite">
-                {count} de {total}
-              </span>
-            )}
-            {!filtering && <ToggleAll allOpen={allOpen} onChange={(o) => setAll(ids, o)} />}
-          </span>
+        <div className="chips" role="group" aria-label="Equipo">
+          {EQUIPMENT_OPTIONS.map((o) => (
+            <button key={o.value} className="chip" aria-pressed={equipment === o.value} onClick={() => setEquipment(o.value)}>
+              {o.label}
+            </button>
+          ))}
         </div>
+        {filtering && (
+          <span className="eyebrow" aria-live="polite">
+            {count} de {total}
+          </span>
+        )}
       </div>
 
       {loaded && filtering && count === 0 && (

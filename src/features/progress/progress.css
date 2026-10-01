@@ -1,28 +1,30 @@
-.prog__stats {
-  --cols: 2 !important;
+.prog__hero {
+  display: grid;
+  gap: 4px;
+  padding: 24px 20px 20px;
 }
-.prog__stats .stat:nth-child(3) {
-  border-left: 0;
-  padding-left: 0;
+.prog__heronum {
+  font-size: 64px;
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  line-height: 1;
 }
-.prog__stats .stat:nth-child(n + 3) {
-  border-top: var(--b1);
+.prog__herolabel {
+  font-size: 17px;
+  color: var(--ink-2);
 }
-@media (min-width: 700px) {
-  .prog__stats {
-    --cols: 4 !important;
-  }
-  .prog__stats .stat:nth-child(3) {
-    border-left: var(--b1);
-    padding-left: 12px;
-  }
-  .prog__stats .stat:nth-child(n + 3) {
-    border-top: 0;
-  }
+.prog__weeks {
+  display: grid;
+  gap: 12px;
 }
 @media (min-width: 900px) {
   .prog__grid {
     row-gap: 40px;
+  }
+}
+@media (max-width: 899px) {
+  .prog__grid {
+    gap: var(--block-gap);
   }
 }
 
@@ -30,7 +32,7 @@
   display: flex;
   align-items: center;
   gap: 2px;
-  margin: -10px 0;
+  margin-left: -12px;
 }
 
 .trend {
@@ -56,25 +58,6 @@
 .trend .num {
   text-align: right;
   padding-right: 0;
-}
-
-.tabs-line {
-  display: flex;
-  gap: 0;
-  border-bottom: var(--b2);
-}
-.tabs-line button {
-  min-height: 44px;
-  padding: 0 14px;
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--muted);
-  border-bottom: 4px solid transparent;
-  margin-bottom: -2px;
-}
-.tabs-line button[aria-selected='true'] {
-  color: var(--ink);
-  border-bottom-color: var(--ink);
 }
 
 .reps-table {
@@ -110,4 +93,14 @@
   flex-wrap: wrap;
   gap: 2px 12px;
   font-size: 14px;
+}
+
+.xh__date {
+  font-size: 15px;
+  color: var(--ink-2);
+  font-weight: 600;
+  text-decoration: none;
+}
+.xp__chart .seg {
+  justify-self: start;
 }

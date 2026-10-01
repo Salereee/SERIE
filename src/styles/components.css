@@ -1104,10 +1104,10 @@ body:has(.rest) .toasts {
   align-items: start;
   width: 100%;
   min-height: 44px;
-  padding: 10px 12px;
-  border-left: 3px solid var(--accent);
-  background: var(--fill);
-  font-size: 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--surface);
+  font-size: 15px;
   line-height: 1.4;
   text-align: left;
   color: var(--ink);
@@ -1242,4 +1242,18 @@ body:has(.rest) .toasts {
   font-size: 15px;
   font-weight: 500;
   text-align: right;
+}
+
+/* Volver a la pantalla madre (detalle de programa, ejercicio, sesión del historial). */
+.back-link {
+  justify-self: start;
+  margin-left: -8px;
+  min-height: 40px;
+}
+
+/* Segmentado de navegación (Rutinas, Progreso): ancho completo en celular, compacto en escritorio. */
+@media (min-width: 900px) {
+  .segnav {
+    max-width: 400px;
+  }
 }

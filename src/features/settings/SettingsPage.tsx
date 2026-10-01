@@ -75,7 +75,7 @@ export function SettingsPage() {
     <div className="page settings">
       <header className="page-head">
         <span className="eyebrow">Versión {__APP_VERSION__}</span>
-        <h1 className="title-lg">Ajustes</h1>
+        <h1 className="title-xl">Ajustes</h1>
         <p className="small muted">Tus datos viven solo en este dispositivo y este navegador; nada se envía a internet.</p>
       </header>
 
